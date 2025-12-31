@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Pie Calculator | FarmRPG Toolkit</title>
+  <link rel="stylesheet" href="/assets/style.css">
+  <script defer src="/assets/nav.js"></script>
+  <script defer src="apple-pie-calc.js"></script>
+</head>
+<body>
+  <main class="container">
+    <div id="nav"></div>
+    <div class="title-row">
+      <img src="/assets/img/applepie.png" alt="Apple Pie" class="pie-icon" />
+      <h1>Should I eat the pie?</h1>
+      <img src="/assets/img/applepie.png" alt="Apple Pie" class="pie-icon" />
+    </div>
+    <section class="info-card">
+      <button id="expandInfo" class="expand-info-btn" aria-expanded="false" aria-controls="infoContent" type="button">
+        <span class="expand-label">How does this calculator work?</span>
+        <span class="expand-arrow">&#9660;</span>
+      </button>
+      <div id="infoContent" class="info-content" style="display:none;">
+        <p>This tool helps you decide whether to eat your Apple Pies now or wait until you reach a higher Tower level in FarmRPG. The stamina you gain from eating pies depends on your Exploring and Tower levels.</p>
+        <ul>
+          <li>Enter how many pies you have, your current and target Tower levels, and how long it will take you to reach your target.</li>
+          <li>The calculator will show you how much stamina you lose by waiting, how much extra stamina you gain per day, and how long it takes to break even.</li>
+        </ul>
+        <p>If you're unsure, use this calculator to compare your options and make the best decision for your play style!</p>
+      </div>
+    </section>
+    <section class="card inputs">
+      <h2>Inputs</h2>
+      <form id="calc-form" autocomplete="off">
+        <div class="row-group">
+          <div class="input-group half-width">
+            <label for="numPies">Number of Apple Pies</label>
+            <input type="number" id="numPies" min="1" step="1" value="1">
+          </div>
+          <div class="input-group half-width">
+            <label for="exploringLevel">Exploring Level</label>
+            <input type="number" id="exploringLevel" min="0" step="1" value="99">
+          </div>
+        </div>
+        <div class="row-group">
+          <div class="input-group half-width">
+            <label for="currentTower">Current Tower Level</label>
+            <input type="number" id="currentTower" min="50" max="100" step="1" value="50">
+          </div>
+          <div class="input-group half-width">
+            <label for="targetTower">Target Tower Level</label>
+            <input type="number" id="targetTower" min="0" max="300" step="1" value="100">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="waitAmount">How long will it take you to reach your target Tower level?</label>
+          <div class="wait-row">
+            <input type="number" id="waitAmount" min="1" step="1" value="1">
+            <select id="waitUnit">
+              <option value="days">days</option>
+              <option value="weeks">weeks</option>
+              <option value="months">months</option>
+            </select>
+            <span id="waitUnitLabel"></span>
+          </div>
+        </div>
+      </form>
+    </section>
+    <section class="card results">
+      <div id="explore-warning" class="explore-warning" style="display:none;"></div>
+      <h2>Results</h2>
+      <div class="result-row">
+        <span class="result-label">Total stamina lost by waiting:</span>
+        <span class="result-value loss" id="lostStamina">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Extra daily stamina gained by waiting:</span>
+        <span class="result-value gain" id="extraDaily">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Break-even time:</span>
+        <span class="result-value" id="breakEven">—</span>
+      </div>
+    </section>
+    <footer>
+      <small>All calculations are performed locally in your browser.</small>
+    </footer>
+  </main>
+  <script>
+    const expandInfo = document.getElementById('expandInfo');
+    const infoContent = document.getElementById('infoContent');
+    expandInfo.addEventListener('click', () => {
+      const expanded = expandInfo.getAttribute('aria-expanded') === 'true';
+      expandInfo.setAttribute('aria-expanded', !expanded);
+      infoContent.style.display = expanded ? 'none' : 'block';
+      expandInfo.querySelector('.expand-arrow').innerHTML = expanded ? '&#9660;' : '&#9650;';
+    });
+  </script>
+</body>
+</html>
