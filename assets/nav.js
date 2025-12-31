@@ -1,12 +1,18 @@
 // Responsive navigation
+// Detect base path for local or GitHub Pages
+let basePath = '/';
+if (window.location.pathname.includes('/farmrpg-toolkit/')) {
+  basePath = '/farmrpg-toolkit/';
+}
+
 const navLinks = [
-  { name: 'Home', href: '/' },
-  { name: 'Apple Pie Calculator', href: '/apps/apple-pie-calc.html' },
-  { name: 'Second App', href: '/apps/second-app.html' },
-  { name: 'Third App', href: '/apps/third-app.html' },
-  { name: 'Fourth App', href: '/apps/fourth-app.html' },
-  { name: 'Fifth App', href: '/apps/fifth-app.html' },
-  { name: 'Sixth App', href: '/apps/sixth-app.html' }
+  { name: 'Home', href: basePath + 'index.html' },
+  { name: 'Apple Pie Calculator', href: basePath + 'apps/apple-pie-calc.html' },
+  { name: 'Second App', href: basePath + 'apps/second-app.html' },
+  { name: 'Third App', href: basePath + 'apps/third-app.html' },
+  { name: 'Fourth App', href: basePath + 'apps/fourth-app.html' },
+  { name: 'Fifth App', href: basePath + 'apps/fifth-app.html' },
+  { name: 'Sixth App', href: basePath + 'apps/sixth-app.html' }
 ];
 
 function renderNav() {
@@ -14,7 +20,7 @@ function renderNav() {
   nav.innerHTML = `
     <nav class="main-nav">
       <div class="nav-title-row">
-        <span class="nav-title">FarmRPG Toolkit</span>
+  <a class="nav-title" href="${basePath}index.html" style="text-decoration:none;color:#2e7d4f;">FarmRPG Toolkit</a>
         <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect y="7" width="32" height="3.5" rx="2" fill="#2e7d4f"/>
