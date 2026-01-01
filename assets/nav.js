@@ -8,11 +8,7 @@ if (window.location.pathname.includes('/farmrpg-toolkit/')) {
 const navLinks = [
   { name: 'Home', href: basePath + 'index.html' },
   { name: 'Apple Pie Calculator', href: basePath + 'apps/apple-pie-calc.html' },
-  { name: 'Second App', href: basePath + 'apps/second-app.html' },
-  { name: 'Third App', href: basePath + 'apps/third-app.html' },
-  { name: 'Fourth App', href: basePath + 'apps/fourth-app.html' },
-  { name: 'Fifth App', href: basePath + 'apps/fifth-app.html' },
-  { name: 'Sixth App', href: basePath + 'apps/sixth-app.html' }
+  { name: 'Crop Yield Calculator', href: basePath + 'apps/crop-calc.html' },
 ];
 
 function renderNav() {
