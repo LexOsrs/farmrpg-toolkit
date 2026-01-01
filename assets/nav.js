@@ -17,7 +17,7 @@ function renderNav() {
     <nav class="main-nav">
       <div class="nav-title-row">
         <div class="nav-title-left">
-          <img src="${basePath}assets/img/farm_large.png" alt="Farm" class="farm-icon" style="margin-right:8px;" />
+            <img src="${basePath}assets/img/farm_large.png" alt="Farm" class="farm-icon" style="margin-right:8px;width:34px;height:34px;object-fit:contain;vertical-align:middle;" />
           <a class="nav-title" href="${basePath}index.html" style="text-decoration:none;color:#2e7d4f;display:inline-block;vertical-align:middle;">FarmRPG Toolkit</a>
         </div>
         <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
