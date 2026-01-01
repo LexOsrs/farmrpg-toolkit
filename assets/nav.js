@@ -16,7 +16,10 @@ function renderNav() {
   nav.innerHTML = `
     <nav class="main-nav">
       <div class="nav-title-row">
-  <a class="nav-title" href="${basePath}index.html" style="text-decoration:none;color:#2e7d4f;">FarmRPG Toolkit</a>
+        <div class="nav-title-left">
+            <img src="${basePath}assets/img/farm_large.png" alt="Farm" class="farm-icon" style="margin-right:8px;width:34px;height:34px;object-fit:contain;vertical-align:middle;" />
+          <a class="nav-title" href="${basePath}index.html" style="text-decoration:none;color:#2e7d4f;display:inline-block;vertical-align:middle;">FarmRPG Toolkit</a>
+        </div>
         <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect y="7" width="32" height="3.5" rx="2" fill="#2e7d4f"/>
