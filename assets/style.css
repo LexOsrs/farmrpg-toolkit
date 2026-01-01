@@ -1,3 +1,18 @@
+/* Consistent dropdown style for calculators */
+.dropdown {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 7px;
+  font-size: 1rem;
+  background: #f8fafc;
+}
+.result-progress {
+  color: #4a5568;
+  font-size: 1em;
+  font-weight: 400;
+  margin-left: 6px;
+}
 /* Move your main CSS here. Add nav styles below. */
 html {
   box-sizing: border-box;
