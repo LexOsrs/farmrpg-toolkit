@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Friendship Calculator | FarmRPG Toolkit</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script defer src="../assets/nav.js"></script>
+  <script defer src="friendship-calc.js"></script>
+</head>
+<body>
+  <main class="container">
+    <div id="nav"></div>
+    <div class="title-row">
+      <span style="font-size:1.7em;margin-right:8px;">🤝</span>
+      <h1>Friendship Calculator</h1>
+      <span style="font-size:1.7em;margin-left:8px;">🤝</span>
+    </div>
+    <section class="card info">
+      <button id="expandInfo" class="expand-info-btn" aria-expanded="false" aria-controls="infoContent" type="button">
+        <span class="expand-label">How does this calculator work?</span>
+        <span class="expand-arrow">&#9660;</span>
+      </button>
+      <div id="infoContent" class="info-content" style="display:none;">
+        <ul>
+          <li>Enter the number and type of items you plan to gift to a Townsfolk.</li>
+          <li>Select any relevant bonuses or perks you have (TOTD, Friendship Primer, Meal, O.M.G. perks).</li>
+          <li>The calculator will show the total friendship XP gained and the number of levels advanced.</li>
+        </ul>
+        <p><strong>XP per gift:</strong> Loved: 150 XP, Liked: 25 XP, Hated: -50 XP, Other: 1 XP. All bonuses stack multiplicatively. O.M.G. perks apply a chance for a 7-10x XP bonus per give action.</p>
+      </div>
+    </section>
+    <section class="card inputs">
+      <h2>Inputs</h2>
+      <form id="friendship-form" autocomplete="off">
+        <div class="row-group">
+          <div class="input-group" style="max-width:110px;">
+            <label for="giftCount">Quantity</label>
+            <input type="number" id="giftCount" min="1" step="1" value="1" style="width:70px;">
+          </div>
+          <div class="input-group half-width">
+            <label for="giftType">Gift Type</label>
+            <select id="giftType" class="dropdown">
+              <option value="loved">Loved (+150 XP)</option>
+              <option value="liked">Liked (+25 XP)</option>
+              <option value="other">Other (+1 XP)</option>
+              <option value="heart">Heart Container (+10,000,000 XP)</option>
+              <option value="bouquet">Bouquet of Flowers (+1,000 XP)</option>
+              <option value="prism">Prism Shell (+100,000,000 XP) (Geist only)</option>
+              <option value="mask">Ramjoram's Mask (+100,000,000 XP) (Star Meerif only)</option>
+              <option value="corn">Refined Corn Quartz (+100,000,000 XP) (ROOMBA & Jill only)</option>
+              <option value="mace">Five Point Mace (+100,000,000 XP) (Ric Ryph only)</option>
+              <option value="palette">Perfect Paint Palette (+100,000,000 XP) (George only)</option>
+              <option value="garebear">Gare Bear (+100,000,000 XP) (Gary Bearson V. only)</option>
+            </select>
+          </div>
+        </div>
+        <div class="row-group">
+          <div class="input-group half-width">
+            <label for="currentLevel">Current Level</label>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <input type="number" id="currentLevel" min="1" max="99" step="0.1" value="1.0" style="width:90px;">
+              <span id="currentXP" style="font-size:0.98em;color:#4a5568;">XP (estimated): 0</span>
+            </div>
+          </div>
+        </div>
+        <div class="row-group">
+          <div class="input-group half-width">
+            <label><input type="checkbox" id="totd"> Townsfolk of the Day (2x XP)</label>
+          </div>
+        </div>
+        <div class="row-group">
+          <div class="input-group half-width">
+            <label><input type="checkbox" id="meal"> Over The Moon (10% XP)</label>
+          </div>
+        </div>
+        <div class="row-group">
+          <div class="input-group" style="width:100%;">
+            <div style="font-size:1.18em;font-weight:600;margin-bottom:8px;">Perks</div>
+            <label for="primer" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <input type="checkbox" id="primer">
+              Friendship Primer <span style="color:#888;">(10% XP)</span>
+            </label>
+            <label for="omg1" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <input type="checkbox" id="omg1">
+              O.M.G I <span style="color:#888;">(5% chance for 7-10x XP)</span>
+            </label>
+            <label for="omg2" style="display:flex;align-items:center;gap:8px;">
+              <input type="checkbox" id="omg2">
+              O.M.G II <span style="color:#888;">(5% chance for 7-10x XP)</span>
+            </label>
+          </div>
+        </div>
+      </form>
+    </section>
+    <section class="card results">
+      <h2>Results</h2>
+      <!-- Results will be displayed here -->
+    </section>
+    <footer>
+      <small>All calculations are performed locally in your browser.<br>
+      <span style="color:#888;">FarmRPG Toolkit is an independent fan project and is not affiliated with FarmRPG or its creators.</span></small>
+    </footer>
+  </main>
+  <script>
+    const expandInfo = document.getElementById('expandInfo');
+    const infoContent = document.getElementById('infoContent');
+    expandInfo.addEventListener('click', () => {
+      const expanded = expandInfo.getAttribute('aria-expanded') === 'true';
+      expandInfo.setAttribute('aria-expanded', !expanded);
+      infoContent.style.display = expanded ? 'none' : 'block';
+      expandInfo.querySelector('.expand-arrow').innerHTML = expanded ? '&#9660;' : '&#9650;';
+    });
+  </script>
+</body>
+</html>
