@@ -23,11 +23,12 @@
       </button>
       <div id="infoContent" class="info-content" style="display:none;">
         <ul>
-          <li>Enter the number and type of items you plan to gift to a Townsfolk.</li>
-          <li>Select any relevant bonuses or perks you have (TOTD, Friendship Primer, Meal, O.M.G. perks).</li>
-          <li>The calculator will show the total friendship XP gained and the number of levels advanced.</li>
+          <li>Enter your <strong>current friendship level</strong> with the Townsfolk. There is no way to see the exact value in-game, so you will need to estimate a decimal based on how full the friendship bar is.</li>
+          <li>Enter the number and type of items you plan to gift.</li>
+          <li>Select any relevant bonuses or perks you have (Townsfolk of the Day, Over The Moon, Friendship Primer, O.M.G. perks).</li>
+          <li>The calculator will show the total friendship XP gained and your new level after gifting.</li>
         </ul>
-        <p><strong>XP per gift:</strong> Loved: 150 XP, Liked: 25 XP, Hated: -50 XP, Other: 1 XP. All bonuses stack multiplicatively. O.M.G. perks apply a chance for a 7-10x XP bonus per give action.</p>
+        <p><strong>XP per gift:</strong> Loved: 150 XP, Liked: 25 XP, Other: 1 XP. All bonuses stack multiplicatively. O.M.G. perks apply a chance for a 7-10x XP bonus per give action. Special items (e.g. Heart Container, Prism Shell) give large, fixed amounts of XP.</p>
       </div>
     </section>
     <section class="card inputs">
@@ -36,7 +37,7 @@
         <div class="row-group">
           <div class="input-group" style="max-width:110px;">
             <label for="giftCount">Quantity</label>
-            <input type="number" id="giftCount" min="1" step="1" value="1" style="width:70px;">
+            <input type="number" id="giftCount" min="1" step="1" value="1" style="width:100px;">
           </div>
           <div class="input-group half-width">
             <label for="giftType">Gift Type</label>
@@ -64,30 +65,29 @@
             </div>
           </div>
         </div>
-        <div class="row-group">
-          <div class="input-group half-width">
-            <label><input type="checkbox" id="totd"> Townsfolk of the Day (2x XP)</label>
-          </div>
-        </div>
-        <div class="row-group">
-          <div class="input-group half-width">
-            <label><input type="checkbox" id="meal"> Over The Moon (10% XP)</label>
-          </div>
         </div>
         <div class="row-group">
           <div class="input-group" style="width:100%;">
-            <div style="font-size:1.18em;font-weight:600;margin-bottom:8px;">Perks</div>
+            <div style="font-size:1.18em;font-weight:600;margin-bottom:8px;">Bonuses</div>
+            <label for="totd" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <input type="checkbox" id="totd">
+              Townsfolk of the Day <span style="color:#888;">(2x XP)</span>
+            </label>
+            <label for="meal" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <input type="checkbox" id="meal">
+              Over The Moon <span style="color:#888;">(10% XP, meal)</span>
+            </label>
             <label for="primer" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
               <input type="checkbox" id="primer">
-              Friendship Primer <span style="color:#888;">(10% XP)</span>
+              Friendship Primer <span style="color:#888;">(10% XP, perk)</span>
             </label>
             <label for="omg1" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
               <input type="checkbox" id="omg1">
-              O.M.G I <span style="color:#888;">(5% chance for 7-10x XP)</span>
+              O.M.G I <span style="color:#888;">(5% chance for 7-10x XP, perk)</span>
             </label>
             <label for="omg2" style="display:flex;align-items:center;gap:8px;">
               <input type="checkbox" id="omg2">
-              O.M.G II <span style="color:#888;">(5% chance for 7-10x XP)</span>
+              O.M.G II <span style="color:#888;">(5% chance for 7-10x XP, perk)</span>
             </label>
           </div>
         </div>
