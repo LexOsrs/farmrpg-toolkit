@@ -48,22 +48,22 @@
             <div style="font-size:1.15em;font-weight:700;margin-bottom:8px;border-bottom:1px solid #eee;padding-bottom:2px;">Meals</div>
             <div class="input-group" style="margin-bottom:12px;">
               <label for="meal">Meal</label>
-              <select id="meal" class="dropdown"></select>
+              <select id="meal" name="meal" class="dropdown"></select>
             </div>
             <div class="input-group" style="margin-bottom:12px;max-width:120px;">
               <label for="batchSize">Quantity</label>
-              <input type="number" id="batchSize" min="1" step="1" value="1" style="width:100px;">
+              <input type="number" id="batchSize" name="batchSize" min="1" step="1" value="1" style="width:100px;">
             </div>
             <div class="input-group" style="margin-bottom:16px;max-width:120px;">
               <label for="maxOvens">Max Ovens</label>
-              <input type="number" id="maxOvens" min="1" max="10" step="1" value="1" style="width:70px;">
+              <input type="number" id="maxOvens" name="maxOvens" min="1" max="10" step="1" value="1" style="width:70px;">
             </div>
             <div style="font-size:1.15em;font-weight:700;margin-bottom:8px;margin-top:18px;border-bottom:1px solid #eee;padding-bottom:2px;">Meal Actions</div>
             <div class="input-group" style="margin-bottom:16px;">
-              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><input type="checkbox" id="doStir" checked> <span style="font-weight:bold;color:#003300;">Stir</span> <span style="color:#888;">(reduces time, XP gain)</span></label>
-              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><input type="checkbox" id="doTaste" checked> <span style="font-weight:bold;color:#00007f;">Taste</span> <span style="color:#888;">(gives mastery, XP)</span></label>
-              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><input type="checkbox" id="doSeason" checked> <span style="font-weight:bold;color:#4a315c;">Season</span> <span style="color:#888;">(bonus XP)</span></label>
-              <label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="doCollect" checked> <span style="font-weight:bold;color:#351c04;">Collect</span> <span style="color:#888;">(final XP)</span></label>
+              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><input type="checkbox" id="doStir" name="doStir" checked> <span style="font-weight:bold;color:#003300;">Stir</span> <span style="color:#888;">(reduces time, XP gain)</span></label>
+              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><input type="checkbox" id="doTaste" name="doTaste" checked> <span style="font-weight:bold;color:#00007f;">Taste</span> <span style="color:#888;">(gives mastery, XP)</span></label>
+              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><input type="checkbox" id="doSeason" name="doSeason" checked> <span style="font-weight:bold;color:#4a315c;">Season</span> <span style="color:#888;">(bonus XP)</span></label>
+              <label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="doCollect" name="doCollect" checked> <span style="font-weight:bold;color:#351c04;">Collect</span> <span style="color:#888;">(final XP)</span></label>
             </div>
           </div>
           <!-- Right Column: XP Bonuses, Cooking Speed Perks -->
@@ -71,29 +71,29 @@
             <div style="font-size:1.13em;font-weight:600;margin:0 0 6px 0;">XP Bonuses</div>
             <div class="input-group" style="margin-bottom:8px;">
               <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <input type="checkbox" id="perkAlmanac">
+                <input type="checkbox" id="perkAlmanac" name="perkAlmanac">
                 Cooking Almanac <span style="color:#888;">(+10% XP)</span>
               </label>
             <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <input type="checkbox" id="perkAlmanac2">
+                <input type="checkbox" id="perkAlmanac2" name="perkAlmanac2">
                 Cooking Almanac II <span style="color:#888;">(+10% XP)</span>
               </label>
               <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <input type="checkbox" id="perkPrimer">
+                <input type="checkbox" id="perkPrimer" name="perkPrimer">
                 Cooking Primer <span style="color:#888;">(+10% XP)</span>
               </label>
               <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <input type="checkbox" id="perkPrimer2">
+                <input type="checkbox" id="perkPrimer2" name="perkPrimer2">
                 Cooking Primer II <span style="color:#888;">(+10% XP)</span>
               </label>
               <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <input type="checkbox" id="perkFishChips">
+                <input type="checkbox" id="perkFishChips" name="perkFishChips">
                 Fish and Chips <span style="color:#888;">(20x XP)</span>
               </label>
               <div class="input-group" style="max-width:140px;margin-bottom:4px;">
                 <label for="eventBonus">Event XP Bonus</label>
                 <div style="display:flex;align-items:center;gap:4px;">
-                  <input type="number" id="eventBonus" min="0" max="100" step="1" value="0" style="width:60px;">
+                  <input type="number" id="eventBonus" name="eventBonus" min="0" max="100" step="1" value="0" style="width:60px;">
                   <span style="font-size:1.1em;color:#888;">%</span>
                 </div>
               </div>
@@ -101,15 +101,15 @@
             <div style="font-size:1.13em;font-weight:600;margin:16px 0 6px 0;">Cooking Speed Perks</div>
             <div class="input-group">
               <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <input type="checkbox" id="perkHotterOvens">
+                <input type="checkbox" id="perkHotterOvens" name="perkHotterOvens">
                 Hotter Ovens I <span style="color:#888;">(10% faster)</span>
               </label>
               <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <input type="checkbox" id="perkQuicker1">
+                <input type="checkbox" id="perkQuicker1" name="perkQuicker1">
                 Quicker Cooking I <span style="color:#888;">(5% faster)</span>
               </label>
               <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <input type="checkbox" id="perkQuicker2">
+                <input type="checkbox" id="perkQuicker2" name="perkQuicker2">
                 Quicker Cooking II <span style="color:#888;">(10% faster)</span>
               </label>
             </div>

@@ -125,9 +125,13 @@ function recalculate() {
 
 // Recalculate on input change
 
-[numPiesInput, waitAmountInput, waitUnitInput, exploringLevelInput, currentTowerInput, targetTowerInput].forEach(input => {
-	input.addEventListener('input', recalculate);
+window.addEventListener('DOMContentLoaded', function() {
+	const form = document.getElementById('calc-form');
+	const FORM_KEY = 'applePieCalcForm';
+	restoreFormState(form, FORM_KEY);
+	form.addEventListener('input', () => {
+		saveFormState(form, FORM_KEY);
+		recalculate();
+	});
+	recalculate();
 });
-
-// Initial calculation
-recalculate();

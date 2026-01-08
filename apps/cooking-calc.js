@@ -1,6 +1,7 @@
 
 // --- Timeline Generation using lib ---
 import { calculateTimeline, getMealByName, meals } from './cooking-calc-lib.js';
+import { saveFormState, restoreFormState } from '../assets/formPersistence.js';
 // --- Populate Meal Dropdown ---
 async function populateMealDropdown() {
 	let lib;
@@ -296,26 +297,13 @@ function formatTime(totalSeconds) {
 
 // --- Event Listeners ---
 window.addEventListener('DOMContentLoaded', function() {
-	populateMealDropdown();
-	// Set default meal to Onion Soup
-	const mealSelect = document.getElementById('meal');
-	if (mealSelect) mealSelect.value = 'Onion Soup';
-	// Enable all perks by default
-	const perkHotterOvens = document.getElementById('perkHotterOvens');
-	const perkQuicker1 = document.getElementById('perkQuicker1');
-	const perkQuicker2 = document.getElementById('perkQuicker2');
-	const perkAlmanac = document.getElementById('perkAlmanac');
-	const perkAlmanac2 = document.getElementById('perkAlmanac2');
-	const perkPrimer = document.getElementById('perkPrimer');
-	const perkPrimer2 = document.getElementById('perkPrimer2');
-	const perkFishChips = document.getElementById('perkFishChips');
-	if (perkHotterOvens) perkHotterOvens.checked = true;
-	if (perkQuicker1) perkQuicker1.checked = true;
-	if (perkQuicker2) perkQuicker2.checked = true;
-	if (perkAlmanac) perkAlmanac.checked = true;
-	if (perkAlmanac2) perkAlmanac2.checked = true;
-	if (perkPrimer) perkPrimer.checked = true;
-	if (perkPrimer2) perkPrimer2.checked = true;
-	document.getElementById('cooking-form').addEventListener('input', calculateCooking);
-	calculateCooking();
+		populateMealDropdown();
+		const form = document.getElementById('cooking-form');
+		const FORM_KEY = 'cookingCalcForm';
+		restoreFormState(form, FORM_KEY);
+		form.addEventListener('input', () => {
+			saveFormState(form, FORM_KEY);
+			calculateCooking();
+		});
+		calculateCooking();
 });
