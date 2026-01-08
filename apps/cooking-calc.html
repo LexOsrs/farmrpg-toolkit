@@ -1,0 +1,140 @@
+<!-- Cooking Calculator | FarmRPG Toolkit -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cooking Calculator | FarmRPG Toolkit</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script defer src="../assets/nav.js"></script>
+  <script type="module" src="cooking-calc.js"></script>
+</head>
+<body>
+  <main class="container">
+    <div id="nav"></div>
+    <div class="title-row">
+      <span style="font-size:1.7em;margin-right:8px;">🍲</span>
+      <h1>Cooking Calculator</h1>
+      <span style="font-size:1.7em;margin-left:8px;">🍲</span>
+    </div>
+    <section class="card info">
+      <button id="expandInfo" class="expand-info-btn" aria-expanded="false" aria-controls="infoContent" type="button">
+        <span class="expand-label">How does this calculator work?</span>
+        <span class="expand-arrow">&#9660;</span>
+      </button>
+      <div id="infoContent" class="info-content" style="display:none;">
+        <ul>
+          <li><strong>Meals</strong>: Select your meal, the quantity you plan on cooking, and number of ovens that you own (NOT the number that you plan to use).</li>
+          <li><strong>Meal Actions</strong>: Toggle which actions to simulate (Stir, Taste, Season, Collect). Each action affects time, XP, and mastery differently.</li>
+          <li><strong>XP Bonuses</strong>: Enable perks (Cooking Almanac I/II, Cooking Primer I/II), Fish and Chips (20x XP for next 32 actions), and set any Event XP Bonus.</li>
+          <li><strong>Cooking Speed Perks</strong>: Enable Hotter Ovens and Quicker Cooking perks to speed up cooking time.</li>
+          <li><strong>How to use:</strong> Select your options above. The calculator will show total XP, mastery, time, ingredients, and a step-by-step timeline for your batch.</li>
+        </ul>
+        <p><strong>Notes:</strong><br>
+          - Each oven rolls its own RNG for each action; this calculator uses average values for XP.<br>
+          - Fish and Chips multiplies XP for the next 32 actions by 20x.<br>
+          - Collect XP does not scale with oven count.<br>
+          - All calculations are performed locally in your browser.<br>
+          - See the FarmRPG Library for more details on cooking actions, perks, and mechanics.
+        </p>
+      </div>
+    </section>
+    <section class="card inputs">
+      <h2>Inputs</h2>
+      <form id="cooking-form" autocomplete="off">
+        <div class="row-group" style="display:flex;gap:32px;align-items:flex-start;">
+          <!-- Left Column: Meals and Meal Actions -->
+          <div style="flex:1;min-width:220px;">
+            <div style="font-size:1.15em;font-weight:700;margin-bottom:8px;border-bottom:1px solid #eee;padding-bottom:2px;">Meals</div>
+            <div class="input-group" style="margin-bottom:12px;">
+              <label for="meal">Meal</label>
+              <select id="meal" class="dropdown"></select>
+            </div>
+            <div class="input-group" style="margin-bottom:12px;max-width:120px;">
+              <label for="batchSize">Quantity</label>
+              <input type="number" id="batchSize" min="1" step="1" value="1" style="width:100px;">
+            </div>
+            <div class="input-group" style="margin-bottom:16px;max-width:120px;">
+              <label for="maxOvens">Max Ovens</label>
+              <input type="number" id="maxOvens" min="1" max="10" step="1" value="1" style="width:70px;">
+            </div>
+            <div style="font-size:1.15em;font-weight:700;margin-bottom:8px;margin-top:18px;border-bottom:1px solid #eee;padding-bottom:2px;">Meal Actions</div>
+            <div class="input-group" style="margin-bottom:16px;">
+              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><input type="checkbox" id="doStir" checked> <span style="font-weight:bold;color:#003300;">Stir</span> <span style="color:#888;">(reduces time, XP gain)</span></label>
+              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><input type="checkbox" id="doTaste" checked> <span style="font-weight:bold;color:#00007f;">Taste</span> <span style="color:#888;">(gives mastery, XP)</span></label>
+              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><input type="checkbox" id="doSeason" checked> <span style="font-weight:bold;color:#4a315c;">Season</span> <span style="color:#888;">(bonus XP)</span></label>
+              <label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="doCollect" checked> <span style="font-weight:bold;color:#351c04;">Collect</span> <span style="color:#888;">(final XP)</span></label>
+            </div>
+          </div>
+          <!-- Right Column: XP Bonuses, Cooking Speed Perks -->
+          <div style="flex:1;min-width:220px;">
+            <div style="font-size:1.13em;font-weight:600;margin:0 0 6px 0;">XP Bonuses</div>
+            <div class="input-group" style="margin-bottom:8px;">
+              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <input type="checkbox" id="perkAlmanac">
+                Cooking Almanac <span style="color:#888;">(+10% XP)</span>
+              </label>
+            <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <input type="checkbox" id="perkAlmanac2">
+                Cooking Almanac II <span style="color:#888;">(+10% XP)</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <input type="checkbox" id="perkPrimer">
+                Cooking Primer <span style="color:#888;">(+10% XP)</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <input type="checkbox" id="perkPrimer2">
+                Cooking Primer II <span style="color:#888;">(+10% XP)</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <input type="checkbox" id="perkFishChips">
+                Fish and Chips <span style="color:#888;">(20x XP)</span>
+              </label>
+              <div class="input-group" style="max-width:140px;margin-bottom:4px;">
+                <label for="eventBonus">Event XP Bonus</label>
+                <div style="display:flex;align-items:center;gap:4px;">
+                  <input type="number" id="eventBonus" min="0" max="100" step="1" value="0" style="width:60px;">
+                  <span style="font-size:1.1em;color:#888;">%</span>
+                </div>
+              </div>
+            </div>
+            <div style="font-size:1.13em;font-weight:600;margin:16px 0 6px 0;">Cooking Speed Perks</div>
+            <div class="input-group">
+              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <input type="checkbox" id="perkHotterOvens">
+                Hotter Ovens I <span style="color:#888;">(10% faster)</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <input type="checkbox" id="perkQuicker1">
+                Quicker Cooking I <span style="color:#888;">(5% faster)</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <input type="checkbox" id="perkQuicker2">
+                Quicker Cooking II <span style="color:#888;">(10% faster)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </form>
+    </section>
+    <section class="card results">
+      <h2>Results</h2>
+      <div id="resultsContent"><!-- Results will be displayed here --></div>
+    </section>
+    <footer>
+      <small>All calculations are performed locally in your browser.<br>
+      <span style="color:#888;">FarmRPG Toolkit is an independent fan project and is not affiliated with FarmRPG or its creators.</span></small>
+    </footer>
+  </main>
+  <script>
+    const expandInfo = document.getElementById('expandInfo');
+    const infoContent = document.getElementById('infoContent');
+    expandInfo.addEventListener('click', () => {
+      const expanded = expandInfo.getAttribute('aria-expanded') === 'true';
+      expandInfo.setAttribute('aria-expanded', !expanded);
+      infoContent.style.display = expanded ? 'none' : 'block';
+      expandInfo.querySelector('.expand-arrow').innerHTML = expanded ? '&#9660;' : '&#9650;';
+    });
+  </script>
+</body>
+</html>

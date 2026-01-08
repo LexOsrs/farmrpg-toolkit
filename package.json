@@ -1,0 +1,10 @@
+{
+  "name": "farmrpg-toolkit",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "FarmRPG Toolkit calculators and tools.",
+  "main": "index.js",
+  "scripts": {},
+  "author": "LexOsrs",
+  "license": "MIT"
+}

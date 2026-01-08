@@ -9,6 +9,8 @@ const navLinks = [
   { name: 'Home', href: basePath + 'index.html' },
   { name: 'Apple Pie Calculator', href: basePath + 'apps/apple-pie-calc.html' },
   { name: 'Crop Yield Calculator', href: basePath + 'apps/crop-calc.html' },
+  { name: 'Friendship Calculator', href: basePath + 'apps/friendship-calc.html' },
+  { name: 'Cooking Calculator', href: basePath + 'apps/cooking-calc.html' },
 ];
 
 function renderNav() {
