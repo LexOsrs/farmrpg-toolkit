@@ -49,7 +49,15 @@ function calculateYield() {
 }
 
 // Add event listeners to inputs
+import { saveFormState, restoreFormState } from '../assets/formPersistence.js';
+
 window.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('yield-form').addEventListener('input', calculateYield);
+  const form = document.getElementById('yield-form');
+  const FORM_KEY = 'cropCalcForm';
+  restoreFormState(form, FORM_KEY);
+  form.addEventListener('input', () => {
+    saveFormState(form, FORM_KEY);
+    calculateYield();
+  });
   calculateYield();
 });

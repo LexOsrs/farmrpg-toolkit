@@ -6,7 +6,8 @@
   <title>Friendship Calculator | FarmRPG Toolkit</title>
   <link rel="stylesheet" href="../assets/style.css">
   <script defer src="../assets/nav.js"></script>
-  <script defer src="friendship-calc.js"></script>
+  <script type="module" src="friendship-calc.js"></script>
+  <!-- No changes needed; the script tag is already using type="module" -->
 </head>
 <body>
   <main class="container">
@@ -37,11 +38,11 @@
         <div class="row-group">
           <div class="input-group" style="max-width:110px;">
             <label for="giftCount">Quantity</label>
-            <input type="number" id="giftCount" min="1" step="1" value="1" style="width:100px;">
+            <input type="number" id="giftCount" name="giftCount" min="1" step="1" value="1" style="width:100px;">
           </div>
           <div class="input-group half-width">
             <label for="giftType">Gift Type</label>
-            <select id="giftType" class="dropdown">
+            <select id="giftType" name="giftType" class="dropdown">
               <option value="loved">Loved (+150 XP)</option>
               <option value="liked">Liked (+25 XP)</option>
               <option value="other">Other (+1 XP)</option>
@@ -60,7 +61,7 @@
           <div class="input-group half-width">
             <label for="currentLevel">Current Level</label>
             <div style="display:flex;align-items:center;gap:12px;">
-              <input type="number" id="currentLevel" min="1" max="99" step="0.1" value="1.0" style="width:90px;">
+              <input type="number" id="currentLevel" name="currentLevel" min="1" max="99" step="0.1" value="1.0" style="width:90px;">
               <span id="currentXP" style="font-size:0.98em;color:#4a5568;">XP (estimated): 0</span>
             </div>
           </div>
@@ -70,23 +71,23 @@
           <div class="input-group" style="width:100%;">
             <div style="font-size:1.18em;font-weight:600;margin-bottom:8px;">Bonuses</div>
             <label for="totd" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-              <input type="checkbox" id="totd">
+              <input type="checkbox" id="totd" name="totd">
               Townsfolk of the Day <span style="color:#888;">(2x XP)</span>
             </label>
             <label for="meal" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-              <input type="checkbox" id="meal">
+              <input type="checkbox" id="meal" name="meal">
               Over The Moon <span style="color:#888;">(10% XP, meal)</span>
             </label>
             <label for="primer" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-              <input type="checkbox" id="primer">
+              <input type="checkbox" id="primer" name="primer">
               Friendship Primer <span style="color:#888;">(10% XP, perk)</span>
             </label>
             <label for="omg1" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-              <input type="checkbox" id="omg1">
+              <input type="checkbox" id="omg1" name="omg1">
               O.M.G I <span style="color:#888;">(5% chance for 7-10x XP, perk)</span>
             </label>
             <label for="omg2" style="display:flex;align-items:center;gap:8px;">
-              <input type="checkbox" id="omg2">
+              <input type="checkbox" id="omg2" name="omg2">
               O.M.G II <span style="color:#888;">(5% chance for 7-10x XP, perk)</span>
             </label>
           </div>

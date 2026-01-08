@@ -6,7 +6,7 @@
   <title>Apple Pie Calculator | FarmRPG Toolkit</title>
   <link rel="stylesheet" href="../assets/style.css">
   <script defer src="../assets/nav.js"></script>
-  <script defer src="apple-pie-calc.js"></script>
+    <script type="module" src="apple-pie-calc.js"></script>
 </head>
 <body>
   <main class="container">
@@ -37,28 +37,28 @@
         <div class="row-group">
           <div class="input-group half-width">
             <label for="numPies">Number of Apple Pies</label>
-            <input type="number" id="numPies" min="1" step="1" value="1">
+            <input type="number" id="numPies" name="numPies" min="1" step="1" value="1">
           </div>
           <div class="input-group half-width">
             <label for="exploringLevel">Exploring Level</label>
-            <input type="number" id="exploringLevel" min="0" step="1" value="99">
+            <input type="number" id="exploringLevel" name="exploringLevel" min="0" step="1" value="99">
           </div>
         </div>
         <div class="row-group">
           <div class="input-group half-width">
             <label for="currentTower">Current Tower Level</label>
-            <input type="number" id="currentTower" min="50" max="100" step="1" value="50">
+            <input type="number" id="currentTower" name="currentTower" min="50" max="100" step="1" value="50">
           </div>
           <div class="input-group half-width">
             <label for="targetTower">Target Tower Level</label>
-            <input type="number" id="targetTower" min="0" max="300" step="1" value="100">
+            <input type="number" id="targetTower" name="targetTower" min="0" max="300" step="1" value="100">
           </div>
         </div>
         <div class="input-group">
           <label for="waitAmount">How long will it take you to reach your target Tower level?</label>
           <div class="wait-row">
-            <input type="number" id="waitAmount" min="1" step="1" value="1">
-            <select id="waitUnit">
+            <input type="number" id="waitAmount" name="waitAmount" min="1" step="1" value="1">
+            <select id="waitUnit" name="waitUnit">
               <option value="days">days</option>
               <option value="weeks">weeks</option>
               <option value="months">months</option>
