@@ -91,11 +91,11 @@ const timeline = calculateTimeline({
 
 // Should match the expected timeline exactly
 const expectedTimeline = [
-  { time: 0, action: 'Start cooking' },
+  { time: 0, action: 'Start' },
   { time: 60, action: 'Stir (-39s)' },
   { time: 180, action: 'Taste' },
   { time: 300, action: 'Season' },
-  { time: 411, action: 'Finish cooking' }
+  { time: 411, action: 'Finish' }
 ];
 
 function assertTimeline(actual, expected, msg) {
@@ -125,7 +125,7 @@ const onionTimeline = calculateTimeline({
   perkQuicker2: true
 });
 const expectedOnionTimeline = [
-  { time: 0, action: 'Start cooking' },
+  { time: 0, action: 'Start' },
   { time: 60, action: 'Stir (-4m24s)' },
   { time: 180, action: 'Taste' },
   { time: 300, action: 'Season' },
@@ -133,6 +133,6 @@ const expectedOnionTimeline = [
   { time: 1380, action: 'Taste' },
   { time: 1860, action: 'Stir (-42s)' },
   { time: 2100, action: 'Season' },
-  { time: 2247, action: 'Finish cooking' }
+  { time: 2247, action: 'Finish' }
 ];
 assertTimeline(onionTimeline, expectedOnionTimeline, 'Timeline matches expected steps for Onion Soup with all actions');

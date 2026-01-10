@@ -2,6 +2,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <style>
+    #meal.dropdown {
+      width: 180px !important;
+      min-width: 0;
+      max-width: 100%;
+    }
+    .input-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 7px;
+      margin-bottom: 10px;
+      background: #fcfcfc;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .collapse-btn {
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      font-size: 1.13em;
+      font-weight: 600;
+      padding: 10px 12px;
+      cursor: pointer;
+      outline: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .collapse-btn:after {
+      content: '\25BC';
+      font-size: 0.9em;
+      margin-left: auto;
+      transition: transform 0.2s;
+    }
+    .collapse-btn[aria-expanded="false"]:after {
+      transform: rotate(-90deg);
+    }
+    .collapse-content {
+      padding: 0 16px 12px 16px;
+    }
+    .collapse-content[style*="display: none"] {
+      padding: 0;
+    }
+  </style>
+  <style>
+    /* Only target the meal dropdown for fixed width */
+    #meal.dropdown {
+      width: 180px !important;
+      min-width: 0;
+      max-width: 100%;
+    }
+  </style>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cooking Calculator | FarmRPG Toolkit</title>
@@ -42,78 +93,92 @@
     <section class="card inputs">
       <h2>Inputs</h2>
       <form id="cooking-form" autocomplete="off">
-        <div class="row-group" style="display:flex;gap:32px;align-items:flex-start;">
-          <!-- Left Column: Meals and Meal Actions -->
-          <div style="flex:1;min-width:220px;">
-            <div style="font-size:1.15em;font-weight:700;margin-bottom:8px;border-bottom:1px solid #eee;padding-bottom:2px;">Meals</div>
-            <div class="input-group" style="margin-bottom:12px;">
-              <label for="meal">Meal</label>
-              <select id="meal" name="meal" class="dropdown"></select>
+        <div class="row-group" style="display:flex;flex-direction:column;gap:10px;align-items:stretch;">
+          <!-- Meals Section -->
+          <section class="input-card">
+            <button type="button" class="collapse-btn" aria-expanded="true" aria-controls="mealsSection">Meals</button>
+            <div id="mealsSection" class="collapse-content" style="display:block;">
+              <div class="input-group" style="margin-bottom:2px;">
+                <label for="meal">Meal</label>
+                <select id="meal" name="meal" class="dropdown" style="width:180px !important;"></select>
+              </div>
+              <div class="input-group" style="margin-bottom:2px;max-width:120px;">
+                <label for="batchSize">Quantity</label>
+                <input type="number" id="batchSize" name="batchSize" min="1" step="1" value="1" style="width:100px;">
+              </div>
+              <div class="input-group" style="margin-bottom:2px;max-width:120px;">
+                <label for="maxOvens">Max Ovens</label>
+                <input type="number" id="maxOvens" name="maxOvens" min="1" max="10" step="1" value="1" style="width:70px;">
+              </div>
             </div>
-            <div class="input-group" style="margin-bottom:12px;max-width:120px;">
-              <label for="batchSize">Quantity</label>
-              <input type="number" id="batchSize" name="batchSize" min="1" step="1" value="1" style="width:100px;">
+          </section>
+          <!-- Meal Actions Section -->
+          <section class="input-card">
+            <button type="button" class="collapse-btn" aria-expanded="true" aria-controls="actionsSection">Meal Actions</button>
+            <div id="actionsSection" class="collapse-content" style="display:block;">
+              <div class="input-group" style="margin-bottom:16px;">
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><input type="checkbox" id="doStir" name="doStir" checked> <span style="font-weight:bold;color:#003300;">Stir</span> <span style="color:#888;">(reduces time, XP gain)</span></label>
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><input type="checkbox" id="doTaste" name="doTaste" checked> <span style="font-weight:bold;color:#00007f;">Taste</span> <span style="color:#888;">(gives mastery, XP)</span></label>
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><input type="checkbox" id="doSeason" name="doSeason" checked> <span style="font-weight:bold;color:#4a315c;">Season</span> <span style="color:#888;">(bonus XP)</span></label>
+                <label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="doCollect" name="doCollect" checked> <span style="font-weight:bold;color:#351c04;">Collect</span> <span style="color:#888;">(final XP)</span></label>
+              </div>
             </div>
-            <div class="input-group" style="margin-bottom:16px;max-width:120px;">
-              <label for="maxOvens">Max Ovens</label>
-              <input type="number" id="maxOvens" name="maxOvens" min="1" max="10" step="1" value="1" style="width:70px;">
-            </div>
-            <div style="font-size:1.15em;font-weight:700;margin-bottom:8px;margin-top:18px;border-bottom:1px solid #eee;padding-bottom:2px;">Meal Actions</div>
-            <div class="input-group" style="margin-bottom:16px;">
-              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><input type="checkbox" id="doStir" name="doStir" checked> <span style="font-weight:bold;color:#003300;">Stir</span> <span style="color:#888;">(reduces time, XP gain)</span></label>
-              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><input type="checkbox" id="doTaste" name="doTaste" checked> <span style="font-weight:bold;color:#00007f;">Taste</span> <span style="color:#888;">(gives mastery, XP)</span></label>
-              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><input type="checkbox" id="doSeason" name="doSeason" checked> <span style="font-weight:bold;color:#4a315c;">Season</span> <span style="color:#888;">(bonus XP)</span></label>
-              <label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="doCollect" name="doCollect" checked> <span style="font-weight:bold;color:#351c04;">Collect</span> <span style="color:#888;">(final XP)</span></label>
-            </div>
-          </div>
-          <!-- Right Column: XP Bonuses, Cooking Speed Perks -->
-          <div style="flex:1;min-width:220px;">
-            <div style="font-size:1.13em;font-weight:600;margin:0 0 6px 0;">XP Bonuses</div>
-            <div class="input-group" style="margin-bottom:8px;">
-              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <input type="checkbox" id="perkAlmanac" name="perkAlmanac">
-                Cooking Almanac <span style="color:#888;">(+10% XP)</span>
-              </label>
-            <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <input type="checkbox" id="perkAlmanac2" name="perkAlmanac2">
-                Cooking Almanac II <span style="color:#888;">(+10% XP)</span>
-              </label>
-              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <input type="checkbox" id="perkPrimer" name="perkPrimer">
-                Cooking Primer <span style="color:#888;">(+10% XP)</span>
-              </label>
-              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <input type="checkbox" id="perkPrimer2" name="perkPrimer2">
-                Cooking Primer II <span style="color:#888;">(+10% XP)</span>
-              </label>
-              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <input type="checkbox" id="perkFishChips" name="perkFishChips">
-                Fish and Chips <span style="color:#888;">(20x XP)</span>
-              </label>
-              <div class="input-group" style="max-width:140px;margin-bottom:4px;">
-                <label for="eventBonus">Event XP Bonus</label>
-                <div style="display:flex;align-items:center;gap:4px;">
-                  <input type="number" id="eventBonus" name="eventBonus" min="0" max="100" step="1" value="0" style="width:60px;">
-                  <span style="font-size:1.1em;color:#888;">%</span>
+          </section>
+          <!-- XP Bonuses Section -->
+          <section class="input-card">
+            <button type="button" class="collapse-btn" aria-expanded="true" aria-controls="xpSection">XP Bonuses</button>
+            <div id="xpSection" class="collapse-content" style="display:block;">
+              <div class="input-group" style="margin-bottom:8px;">
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                  <input type="checkbox" id="perkAlmanac" name="perkAlmanac">
+                  Cooking Almanac <span style="color:#888;">(+10% XP)</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                  <input type="checkbox" id="perkAlmanac2" name="perkAlmanac2">
+                  Cooking Almanac II <span style="color:#888;">(+10% XP)</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                  <input type="checkbox" id="perkPrimer" name="perkPrimer">
+                  Cooking Primer <span style="color:#888;">(+10% XP)</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                  <input type="checkbox" id="perkPrimer2" name="perkPrimer2">
+                  Cooking Primer II <span style="color:#888;">(+10% XP)</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                  <input type="checkbox" id="perkFishChips" name="perkFishChips">
+                  Fish and Chips <span style="color:#888;">(20x XP)</span>
+                </label>
+                <div class="input-group" style="max-width:140px;margin-bottom:4px;">
+                  <label for="eventBonus">Event XP Bonus</label>
+                  <div style="display:flex;align-items:center;gap:4px;">
+                    <input type="number" id="eventBonus" name="eventBonus" min="0" max="100" step="1" value="0" style="width:60px;">
+                    <span style="font-size:1.1em;color:#888;">%</span>
+                  </div>
                 </div>
               </div>
             </div>
-            <div style="font-size:1.13em;font-weight:600;margin:16px 0 6px 0;">Cooking Speed Perks</div>
-            <div class="input-group">
-              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <input type="checkbox" id="perkHotterOvens" name="perkHotterOvens">
-                Hotter Ovens I <span style="color:#888;">(10% faster)</span>
-              </label>
-              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <input type="checkbox" id="perkQuicker1" name="perkQuicker1">
-                Quicker Cooking I <span style="color:#888;">(5% faster)</span>
-              </label>
-              <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <input type="checkbox" id="perkQuicker2" name="perkQuicker2">
-                Quicker Cooking II <span style="color:#888;">(10% faster)</span>
-              </label>
+          </section>
+          <!-- Cooking Speed Perks Section -->
+          <section class="input-card">
+            <button type="button" class="collapse-btn" aria-expanded="true" aria-controls="speedSection">Cooking Speed Perks</button>
+            <div id="speedSection" class="collapse-content" style="display:block;">
+              <div class="input-group">
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                  <input type="checkbox" id="perkHotterOvens" name="perkHotterOvens">
+                  Hotter Ovens I <span style="color:#888;">(10% faster)</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                  <input type="checkbox" id="perkQuicker1" name="perkQuicker1">
+                  Quicker Cooking I <span style="color:#888;">(5% faster)</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                  <input type="checkbox" id="perkQuicker2" name="perkQuicker2">
+                  Quicker Cooking II <span style="color:#888;">(10% faster)</span>
+                </label>
+              </div>
             </div>
-          </div>
+          </section>
         </div>
       </form>
     </section>
@@ -127,6 +192,15 @@
     </footer>
   </main>
   <script>
+    // Collapsible input sections
+    document.querySelectorAll('.collapse-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', !expanded);
+        const content = document.getElementById(btn.getAttribute('aria-controls'));
+        if (content) content.style.display = expanded ? 'none' : 'block';
+      });
+    });
     const expandInfo = document.getElementById('expandInfo');
     const infoContent = document.getElementById('infoContent');
     expandInfo.addEventListener('click', () => {
