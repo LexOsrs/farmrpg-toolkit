@@ -75,7 +75,7 @@ function calculateTimeline({ mealName, maxOvens = 1, eventBonus = 0, doStir = fa
   let timelineSteps = [];
   let currentTime = 0;
   let remainingTime = baseTimeWithPerks;
-  timelineSteps.push({ time: currentTime, action: 'Start cooking', remainingTime });
+  timelineSteps.push({ time: currentTime, action: 'Start', remainingTime });
   let stirTimes = [], tasteTimes = [], seasonTimes = [];
   if (doStir) for (let t = 60; t < 24 * 3600; t += 15 * 60) stirTimes.push(t);
   if (doTaste) for (let t = 180; t < 24 * 3600; t += 20 * 60) tasteTimes.push(t);
@@ -121,7 +121,7 @@ function calculateTimeline({ mealName, maxOvens = 1, eventBonus = 0, doStir = fa
     i++;
   }
   let actualFinishTime = lastActionTime + remainingTime;
-  timelineSteps.push({ time: actualFinishTime, action: 'Finish cooking', remainingTime: 0 });
+  timelineSteps.push({ time: actualFinishTime, action: 'Finish', remainingTime: 0 });
   // Add Collect action if requested
   if (typeof doCollect !== 'undefined' && doCollect) {
     timelineSteps.push({ time: actualFinishTime, action: 'Collect', remainingTime: 0, collectXP: meal.collectXP * xpMult });

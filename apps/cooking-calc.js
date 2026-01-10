@@ -48,10 +48,15 @@ function formatTimeX(totalSeconds) {
 	const m = Math.floor((totalSeconds % 3600) / 60);
 	const s = Math.floor(totalSeconds % 60);
 	let out = '';
-	if (h) out += h + 'h ';
-	if (m || h) out += m + 'm ';
-	out += s + 's';
-	return out.trim();
+	if (h) out += h + 'h';
+	if (m || h) out += m + 'm';
+	if (s > 0) out += s + 's';
+	// If minutes are present and seconds are zero, omit '0s'
+	if ((m > 0 || h > 0) && s === 0) {
+		// do nothing, already omitted
+	}
+	// If only minutes and seconds, and seconds > 0, no space between
+	return out;
 }
 
 async function calculateCooking() {
@@ -152,7 +157,7 @@ async function calculateCooking() {
 	// Render timeline and count actions
 	let timelineSteps = [];
 	let stirActions = 0, tasteActions = 0, seasonActions = 0, collectActions = 0, totalActions = 0;
-	// Only count actions that are present in the timeline (excluding 'Start cooking')
+	// Only count actions that are present in the timeline (excluding 'Start')
 	timelineArr.forEach(step => {
 		let label = `<strong>${formatTimeX(step.time)}:</strong> ${step.action}`;
 		if (step.action.startsWith('Stir')) stirActions++;
@@ -166,11 +171,11 @@ async function calculateCooking() {
 	const tasteActionsTotal = tasteActions * batchSize;
 	const seasonActionsTotal = seasonActions * batchSize;
 	const collectActionsTotal = collectActions * batchSize;
-	// Total actions is the sum of all action steps in the timeline (excluding 'Start cooking' and 'Finish cooking'), times batchSize
-	const totalActionsTotal = (timelineArr.filter(step => step.action !== 'Start cooking' && step.action !== 'Finish cooking').length) * batchSize;
-		// Format timeline as a borderless table with Remaining Time column (rightmost) and Start cooking row
+	// Total actions is the sum of all action steps in the timeline (excluding 'Start' and 'Finish'), times batchSize
+	const totalActionsTotal = (timelineArr.filter(step => step.action !== 'Start' && step.action !== 'Finish').length) * batchSize;
+		// Format timeline as a borderless table with Remaining Time column (rightmost) and Start row
 		let timelineTableRows = '';
-		if (timelineArr.length > 0 && timelineArr[0].action === 'Start cooking') {
+		if (timelineArr.length > 0 && timelineArr[0].action === 'Start') {
 			const step = timelineArr[0];
 			const timeCell = `<td class="timeline-time">${formatTimeX(step.time)}</td>`;
 			const actionCell = `<td class="timeline-action">${step.action}</td>`;
@@ -240,7 +245,7 @@ async function calculateCooking() {
 			const remainingCell = `<td class="timeline-remaining">${formatTimeX(step.remainingTime ?? 0)}</td>`;
 			timelineTableRows += `<tr>${timeCell}${actionCell}${xpCell}${remainingCell}</tr>`;
 		}
-		let timelineHTML = `<div class="timeline-block"><h4>Timeline</h4><table class="timeline-table" style="border-collapse:collapse;width:100%;margin-top:0.5em;"><thead><tr><th style="font-weight:bold;text-align:left;">Time</th><th style="font-weight:bold;text-align:left;">Action</th><th style="font-weight:bold;text-align:left;">XP Gained</th><th style="font-weight:bold;text-align:left;">Remaining</th></tr></thead><tbody>${timelineTableRows}</tbody></table></div>`;
+		let timelineHTML = `<div class="timeline-block"><h4>Timeline</h4><table class="timeline-table" style="border-collapse:collapse;width:100%;margin-top:0.5em;"><thead><tr><th style="font-weight:bold;text-align:left;">Time</th><th style="font-weight:bold;text-align:left;">Action</th><th style="font-weight:bold;text-align:left;">XP</th><th style="font-weight:bold;text-align:left;">Remaining</th></tr></thead><tbody>${timelineTableRows}</tbody></table></div>`;
 
 	// Results output
 	const results = document.getElementById('resultsContent');
