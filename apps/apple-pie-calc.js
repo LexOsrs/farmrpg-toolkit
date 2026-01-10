@@ -2,6 +2,8 @@
 // All calculations are performed client-side.
 // Mechanics assumptions are documented and explicit.
 
+import { saveFormState, restoreFormState } from '../assets/formPersistence.js';
+
 
 // Input elements
 const numPiesInput = document.getElementById('numPies');
