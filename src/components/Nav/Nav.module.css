@@ -1,0 +1,127 @@
+.mainNav {
+  width: 100vw;
+  margin: 0;
+  background: #f8fafc;
+  border-radius: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  padding: 2px 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 8px;
+  min-height: 38px;
+}
+
+.titleLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.titleLink {
+  font-size: 1.45em;
+  font-weight: 700;
+  color: #2e7d4f;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  display: inline-block;
+  vertical-align: middle;
+  transition: opacity 0.2s;
+}
+
+.titleLink:hover {
+  opacity: 0.75;
+}
+
+.farmIcon {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+.toggle {
+  display: block;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 12px;
+  padding: 6px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.toggle:focus {
+  outline: 2px solid #7db7e8;
+  background: #eafbee;
+}
+
+.overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(248, 250, 252, 0.98);
+  z-index: 1000;
+  gap: 32px;
+  transition: opacity 0.25s, visibility 0.25s;
+}
+
+.overlayHidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.overlayLink {
+  font-size: 1.4em;
+  padding: 18px 0;
+  color: #2e7d4f;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 8px;
+  width: 80vw;
+  text-align: center;
+  background: #eafbee;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlayLink:hover, .overlayLink:focus {
+  background: #b7eac7;
+  color: #1b4d2e;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: none;
+  border: none;
+  font-size: 2.2em;
+  color: #2e7d4f;
+  cursor: pointer;
+  padding: 0 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.closeBtn:focus {
+  background: #eafbee;
+}

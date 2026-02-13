@@ -1,0 +1,28 @@
+.card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 1.5px 4px rgba(0,0,0,0.04);
+  padding: 10px 10px 8px 10px;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: box-shadow 0.25s, transform 0.25s;
+}
+
+.card:hover {
+  box-shadow: 0 6px 28px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+}
+
+.info {
+  border-left: 5px solid #ffb84d;
+}
+
+.inputs {
+  border-left: 5px solid #b0b7c3;
+}
+
+.results {
+  border-left: 5px solid #b7eac7;
+}

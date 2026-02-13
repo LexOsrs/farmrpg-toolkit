@@ -1,0 +1,50 @@
+.perkLabel {
+  font-size: 1em;
+  font-weight: 400;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.perkLabel input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-border);
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.perkLabel input[type="checkbox"]:checked {
+  background: var(--color-green);
+  border-color: var(--color-green);
+}
+
+.perkLabel input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 6px;
+  height: 11px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.perkLabel input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--color-green);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--color-focus-green);
+}
+
+.hint {
+  color: #888;
+}

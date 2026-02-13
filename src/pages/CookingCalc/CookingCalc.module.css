@@ -1,0 +1,50 @@
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.emoji {
+  font-size: 1.7em;
+}
+
+.sectionsColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.mealDropdown {
+  width: 180px !important;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.ingredientRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+
+.timelineBlock {
+  margin-top: 12px;
+}
+
+.timelineTable {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 0.5em;
+}
+
+.timelineTable th {
+  font-weight: bold;
+  text-align: left;
+  padding: 4px 8px;
+}
+
+.timelineTable td {
+  padding: 4px 8px;
+}

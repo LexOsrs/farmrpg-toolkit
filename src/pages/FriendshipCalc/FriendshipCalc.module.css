@@ -1,0 +1,37 @@
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.emoji {
+  font-size: 1.7em;
+}
+
+.halfWidth {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.dropdown {
+  width: 100%;
+}
+
+.bonusTitle {
+  font-size: 1.18em;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.levelRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.xpEstimate {
+  font-size: 0.98em;
+  color: #4a5568;
+}

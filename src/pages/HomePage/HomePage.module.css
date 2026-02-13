@@ -1,0 +1,68 @@
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.titleRow h1 {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0 2px;
+}
+
+.farmIcon {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.appList {
+  margin: 18px 0 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.appList li {
+  margin: 0;
+}
+
+.appList a {
+  display: block;
+  background: #eafbee;
+  color: #2e7d4f;
+  font-weight: 600;
+  font-size: 1.08em;
+  padding: 12px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+.appList a::after {
+  content: '\2192';
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.appList a:hover, .appList a:focus {
+  background: #b7eac7;
+  color: #1b4d2e;
+  box-shadow: 0 4px 16px rgba(46,125,79,0.08);
+}
+
+.appList a:hover::after, .appList a:focus::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}

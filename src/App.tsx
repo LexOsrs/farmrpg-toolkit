@@ -1,0 +1,21 @@
+import { Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout/Layout';
+import HomePage from './pages/HomePage/HomePage';
+import ApplePieCalc from './pages/ApplePieCalc/ApplePieCalc';
+import CropYieldCalc from './pages/CropYieldCalc/CropYieldCalc';
+import FriendshipCalc from './pages/FriendshipCalc/FriendshipCalc';
+import CookingCalc from './pages/CookingCalc/CookingCalc';
+
+export default function App() {
+  return (
+    <Routes>
+      <Route element={<Layout />}>
+        <Route index element={<HomePage />} />
+        <Route path="apple-pie" element={<ApplePieCalc />} />
+        <Route path="crop-yield" element={<CropYieldCalc />} />
+        <Route path="friendship" element={<FriendshipCalc />} />
+        <Route path="cooking" element={<CookingCalc />} />
+      </Route>
+    </Routes>
+  );
+}

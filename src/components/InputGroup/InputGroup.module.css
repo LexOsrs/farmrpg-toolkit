@@ -1,0 +1,38 @@
+.inputGroup {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.inputGroup label {
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.inputGroup input {
+  padding: 7px 10px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 7px;
+  font-size: 1rem;
+  margin-bottom: 1px;
+  background: #f8fafc;
+  transition: border 0.2s;
+}
+
+.inputGroup input:disabled {
+  background: #f1f5f9;
+  color: #888;
+  border-style: dashed;
+}
+
+.inputGroup input:focus {
+  border-color: var(--color-green);
+  box-shadow: 0 0 0 4px var(--color-focus-green);
+  outline: none;
+}
+
+.inputGroup small {
+  color: #6b7280;
+  font-size: 0.92em;
+  margin-top: 0;
+}

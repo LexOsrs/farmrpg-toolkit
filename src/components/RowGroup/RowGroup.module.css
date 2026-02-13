@@ -1,0 +1,5 @@
+.rowGroup {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 8px;
+}

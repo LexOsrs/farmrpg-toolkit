@@ -1,0 +1,44 @@
+:root {
+  /* Colors */
+  --color-green: #2e7d4f;
+  --color-green-dark: #1b4d2e;
+  --color-green-bg: #eafbee;
+  --color-green-hover: #b7eac7;
+  --color-text: #222;
+  --color-text-muted: #4a5568;
+  --color-text-light: #6b7280;
+  --color-text-dim: #888;
+  --color-border: #d1d5db;
+  --color-input-bg: #f8fafc;
+  --color-card-bg: #fff;
+  --color-loss: #b94a4a;
+  --color-loss-bg: #fbeaea;
+  --color-gain: #2e7d4f;
+  --color-gain-bg: #eafbee;
+  --color-warning-bg: #fffbe6;
+  --color-warning-text: #8a6d1b;
+  --color-warning-border: #ffe58f;
+  --color-focus: #7db7e8;
+  --color-focus-green: rgba(46, 125, 79, 0.35);
+  --color-info-border: #ffb84d;
+  --color-inputs-border: #b0b7c3;
+  --color-results-border: #b7eac7;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 18px;
+  --space-xl: 32px;
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 7px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-card: 18px;
+
+  /* Shadows */
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.08), 0 1.5px 4px rgba(0,0,0,0.04);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+}

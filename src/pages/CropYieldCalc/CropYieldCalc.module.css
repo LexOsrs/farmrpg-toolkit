@@ -1,0 +1,40 @@
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.emoji {
+  font-size: 1.7em;
+}
+
+.halfWidth {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.dropdown {
+  width: 100%;
+}
+
+.perksTitle {
+  font-size: 1.18em;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.seedWarning {
+  background: #fffbe6;
+  color: #8a6d1b;
+  border: 1.5px solid #ffe58f;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  font-size: 1.04em;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
