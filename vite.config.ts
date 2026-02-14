@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: '/farmrpg-toolkit/',
+  base: '/',
   test: {
     include: ['src/**/*.test.{ts,tsx}'],
   },
