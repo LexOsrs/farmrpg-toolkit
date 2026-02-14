@@ -105,19 +105,30 @@ export default function VaultSolver() {
           </div>
         )}
         {!result.solved && !result.impossible && (
-          <div className={styles.suggestedRow}>
-            <span className={styles.suggestionLabel}>Try guessing</span>
-            <span className={styles.suggestedGuess}>{result.suggestedGuess}</span>
-            <button
-              type="button"
-              className={styles.useGuessBtn}
-              onClick={() => {
-                setGuessInput(result.suggestedGuess);
-                setFeedback([...DEFAULT_FEEDBACK] as Feedback);
-              }}
-            >
-              Use
-            </button>
+          <div className={styles.suggestionBlock}>
+            <div className={styles.suggestedRow}>
+              <span className={styles.suggestionLabel}>Try guessing</span>
+              <span className={styles.suggestedGuess}>{result.suggestedGuess}</span>
+              <button
+                type="button"
+                className={styles.useGuessBtn}
+                onClick={() => {
+                  setGuessInput(result.suggestedGuess);
+                  setFeedback([...DEFAULT_FEEDBACK] as Feedback);
+                }}
+              >
+                Use
+              </button>
+            </div>
+            <div className={styles.suggestionHint}>
+              {guesses.length === 0
+                ? 'Initial guess'
+                : result.remainingCount === 1
+                  ? 'Only possible code'
+                  : result.suggestedIsCandidate
+                    ? 'Could be the code'
+                    : 'Elimination guess — narrows down possibilities'}
+            </div>
           </div>
         )}
 
@@ -141,8 +152,8 @@ export default function VaultSolver() {
           {successChance !== null && (
             <div className={successChance > 0 ? (styles.chanceBadge ?? '') : (styles.chanceBadgeZero ?? '')}>
               {successChance > 0
-                ? `${successChance < 1 ? '< 1' : Math.round(successChance)}% chance`
-                : 'Not a possible code'}
+                ? `${successChance < 1 ? '< 1' : Math.round(successChance)}% chance of being correct`
+                : 'Already eliminated — won\'t be the code'}
             </div>
           )}
 
@@ -200,7 +211,7 @@ export default function VaultSolver() {
           <h2>Guess History</h2>
           {!result.solved && !result.impossible && (
             <span className={styles.remainingText}>
-              {formatNumber(result.remainingCount)} remaining
+              {formatNumber(result.remainingCount)} possible codes remaining
             </span>
           )}
         </div>

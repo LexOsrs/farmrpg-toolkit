@@ -9,6 +9,7 @@ export interface VaultGuessEntry {
 export interface VaultSolverResult {
   remainingCount: number;
   suggestedGuess: string;
+  suggestedIsCandidate: boolean;
   solved: boolean;
   impossible: boolean;
 }
@@ -154,6 +155,8 @@ export function pickBestGuess(candidates: string[]): string {
     const isCandidate = candidateSet.has(guess);
 
     // Rank: 1) higher entropy (lower sum), 2) lower max bucket, 3) prefer candidates
+    // Preferring candidates is a free tiebreaker: if partition quality is equal,
+    // a candidate guess might solve immediately, saving a guess.
     if (
       entropySum < bestEntropy ||
       (entropySum === bestEntropy && maxBucket < bestMaxBucket) ||
@@ -174,6 +177,7 @@ export function solveVault(guesses: VaultGuessEntry[]): VaultSolverResult {
     return {
       remainingCount: 9999,
       suggestedGuess: '0123',
+      suggestedIsCandidate: true,
       solved: false,
       impossible: false,
     };
@@ -189,6 +193,7 @@ export function solveVault(guesses: VaultGuessEntry[]): VaultSolverResult {
     return {
       remainingCount: candidates.length,
       suggestedGuess: lastGuess.guess,
+      suggestedIsCandidate: true,
       solved: true,
       impossible: false,
     };
@@ -198,6 +203,7 @@ export function solveVault(guesses: VaultGuessEntry[]): VaultSolverResult {
     return {
       remainingCount: 0,
       suggestedGuess: '',
+      suggestedIsCandidate: false,
       solved: false,
       impossible: true,
     };
@@ -207,15 +213,18 @@ export function solveVault(guesses: VaultGuessEntry[]): VaultSolverResult {
     return {
       remainingCount: 1,
       suggestedGuess: candidates[0]!,
+      suggestedIsCandidate: true,
       solved: false,
       impossible: false,
     };
   }
 
+  const candidateSet = new Set(candidates);
   const suggested = pickBestGuess(candidates);
   return {
     remainingCount: candidates.length,
     suggestedGuess: suggested,
+    suggestedIsCandidate: candidateSet.has(suggested),
     solved: false,
     impossible: false,
   };
