@@ -63,7 +63,8 @@
 }
 
 .toggle:focus {
-  outline: 2px solid #7db7e8;
+  outline: 2px solid var(--color-green);
+  box-shadow: 0 0 0 4px var(--color-focus-green);
   background: #eafbee;
 }
 
