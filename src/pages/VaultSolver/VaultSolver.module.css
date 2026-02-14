@@ -1,0 +1,275 @@
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.emoji {
+  font-size: 1.7em;
+}
+
+.suggestedRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.suggestedGuess {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.25em;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+}
+
+.useGuessBtn {
+  background: var(--color-green-bg);
+  color: var(--color-green);
+  border: 1.5px solid var(--color-green);
+  border-radius: var(--radius-md);
+  padding: 3px 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.useGuessBtn:hover {
+  background: var(--color-green-hover);
+}
+
+/* Tile grid for feedback entry */
+.tileRow {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 12px 0;
+}
+
+.tile {
+  width: 72px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4em;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.1s, background-color 0.15s, border-color 0.15s;
+  color: #fff;
+}
+
+.tile:hover:not(:disabled) {
+  transform: scale(1.06);
+}
+
+.tile:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.tileGray {
+  background: #808085;
+  border: 2px solid #9a9a9f;
+}
+
+.tileYellow {
+  background: #b5a824;
+  border: 2px dashed #d4ca3a;
+}
+
+.tileBlue {
+  background: #1a9ec2;
+  border: 2px solid #3abfe0;
+}
+
+.tileEmpty {
+  background: var(--color-input-bg);
+  border: 2px solid var(--color-border);
+  color: var(--color-text-dim);
+  cursor: default;
+}
+
+/* Smaller tiles for guess history */
+.historyRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.historyNum {
+  width: 24px;
+  text-align: right;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  font-size: 0.95em;
+}
+
+.historyTileRow {
+  display: flex;
+  gap: 4px;
+}
+
+.historyTile {
+  width: 52px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1em;
+  font-weight: 700;
+  border-radius: 4px;
+  color: #fff;
+}
+
+.historyTileGray {
+  background: #808085;
+  border: 1.5px solid #9a9a9f;
+}
+
+.historyTileYellow {
+  background: #b5a824;
+  border: 1.5px dashed #d4ca3a;
+}
+
+.historyTileBlue {
+  background: #1a9ec2;
+  border: 1.5px solid #3abfe0;
+}
+
+/* Code input */
+.codeInput {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.3em;
+  letter-spacing: 0.25em;
+  width: 110px !important;
+  text-align: center;
+  padding: 8px 12px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-input-bg);
+}
+
+.inputSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.tileHint {
+  font-size: 0.85em;
+  color: var(--color-text-dim);
+  text-align: center;
+}
+
+.chanceBadge {
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--color-gain);
+  text-align: center;
+}
+
+.chanceBadgeZero {
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--color-loss);
+  text-align: center;
+}
+
+/* Buttons */
+.buttonRow {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.submitBtn {
+  background: var(--color-green);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 8px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: var(--color-green-dark);
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.undoBtn {
+  background: var(--color-input-bg);
+  color: var(--color-text);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.undoBtn:hover:not(:disabled) {
+  background: var(--color-border);
+}
+
+.undoBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.resetBtn {
+  background: var(--color-loss-bg);
+  color: var(--color-loss);
+  border: 1.5px solid var(--color-loss);
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.resetBtn:hover:not(:disabled) {
+  background: #f5d0d0;
+}
+
+.resetBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Status banners */
+.solvedBanner {
+  background: var(--color-gain-bg);
+  color: var(--color-gain);
+  border: 1.5px solid var(--color-gain);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.errorBanner {
+  background: var(--color-loss-bg);
+  color: var(--color-loss);
+  border: 1.5px solid var(--color-loss);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 8px;
+}

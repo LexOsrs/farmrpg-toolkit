@@ -5,6 +5,7 @@ import ApplePieCalc from './pages/ApplePieCalc/ApplePieCalc';
 import CropYieldCalc from './pages/CropYieldCalc/CropYieldCalc';
 import FriendshipCalc from './pages/FriendshipCalc/FriendshipCalc';
 import CookingCalc from './pages/CookingCalc/CookingCalc';
+import VaultSolver from './pages/VaultSolver/VaultSolver';
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="crop-yield" element={<CropYieldCalc />} />
         <Route path="friendship" element={<FriendshipCalc />} />
         <Route path="cooking" element={<CookingCalc />} />
+        <Route path="vault" element={<VaultSolver />} />
       </Route>
     </Routes>
   );

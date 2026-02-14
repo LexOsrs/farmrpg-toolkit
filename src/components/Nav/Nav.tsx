@@ -8,6 +8,7 @@ const navLinks = [
   { name: 'Crop Yield Calculator', to: '/crop-yield' },
   { name: 'Friendship Calculator', to: '/friendship' },
   { name: 'Cooking Calculator', to: '/cooking' },
+  { name: 'Vault Solver', to: '/vault' },
 ];
 
 export default function Nav() {
