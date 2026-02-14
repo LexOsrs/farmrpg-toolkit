@@ -17,7 +17,7 @@ let resolved = 0;
 function simulateNode(candidates: string[], depth: number): Map<number, number> {
   if (candidates.length === 0) return new Map();
 
-  const guess = depth === 0 ? '1234' : pickBestGuess(candidates);
+  const guess = depth === 0 ? '0123' : pickBestGuess(candidates);
   const guessNum = depth + 1;
 
   if (depth <= 1) {
@@ -60,7 +60,7 @@ function simulateNode(candidates: string[], depth: number): Map<number, number> 
 }
 
 console.log('Simulating vault solver against all 9,999 codes...');
-console.log('First guess: 1234\n');
+console.log('First guess: 0123\n');
 
 const startTime = performance.now();
 const distribution = simulateNode(ALL_CODES, 0);

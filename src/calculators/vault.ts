@@ -124,22 +124,13 @@ export function filterCandidates(
 export function pickBestGuess(candidates: string[]): string {
   if (candidates.length <= 2) return candidates[0]!;
 
-  // Find "live" digits — those that appear in at least one candidate.
-  // Guesses using dead digits waste positions on zero-information slots.
-  const liveDigits = new Uint8Array(10);
-  for (const code of candidates) {
-    for (let i = 0; i < 4; i++) liveDigits[code.charCodeAt(i) - 48] = 1;
-  }
-
   const candidateSet = new Set(candidates);
   let bestGuess = candidates[0]!;
-  let bestScore = Infinity;
-  let bestDeadCount = 4;
+  let bestEntropy = Infinity;
+  let bestMaxBucket = Infinity;
   let bestIsCandidate = false;
 
   // Search ALL codes (not just candidates) to find information-maximizing guesses.
-  // A non-candidate guess that tests new digits can eliminate far more possibilities
-  // than a "safe" candidate guess that confirms known information.
   const buckets = new Int32Array(81);
 
   for (const guess of ALL_CODES) {
@@ -149,29 +140,27 @@ export function pickBestGuess(candidates: string[]): string {
       buckets[key] = buckets[key]! + 1;
     }
 
+    // Entropy: maximize -sum(p * log(p)), equiv. to minimize sum(b * log(b))
+    let entropySum = 0;
     let maxBucket = 0;
     for (let k = 0; k < 81; k++) {
-      if (buckets[k]! > maxBucket) maxBucket = buckets[k]!;
+      const b = buckets[k]!;
+      if (b > 0) entropySum += b * Math.log(b);
+      if (b > maxBucket) maxBucket = b;
     }
 
-    if (maxBucket > bestScore) continue;
-
-    // Count positions using eliminated digits (waste)
-    let deadCount = 0;
-    for (let i = 0; i < 4; i++) {
-      if (!liveDigits[guess.charCodeAt(i) - 48]) deadCount++;
-    }
+    if (entropySum > bestEntropy) continue;
 
     const isCandidate = candidateSet.has(guess);
 
-    // Rank: 1) lower max bucket, 2) fewer dead digits, 3) prefer candidates
+    // Rank: 1) higher entropy (lower sum), 2) lower max bucket, 3) prefer candidates
     if (
-      maxBucket < bestScore ||
-      (maxBucket === bestScore && deadCount < bestDeadCount) ||
-      (maxBucket === bestScore && deadCount === bestDeadCount && isCandidate && !bestIsCandidate)
+      entropySum < bestEntropy ||
+      (entropySum === bestEntropy && maxBucket < bestMaxBucket) ||
+      (entropySum === bestEntropy && maxBucket === bestMaxBucket && isCandidate && !bestIsCandidate)
     ) {
-      bestScore = maxBucket;
-      bestDeadCount = deadCount;
+      bestEntropy = entropySum;
+      bestMaxBucket = maxBucket;
       bestGuess = guess;
       bestIsCandidate = isCandidate;
     }
@@ -184,7 +173,7 @@ export function solveVault(guesses: VaultGuessEntry[]): VaultSolverResult {
   if (guesses.length === 0) {
     return {
       remainingCount: 9999,
-      suggestedGuess: '1234',
+      suggestedGuess: '0123',
       solved: false,
       impossible: false,
     };
