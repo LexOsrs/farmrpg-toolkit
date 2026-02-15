@@ -5,11 +5,11 @@ import styles from './Nav.module.css';
 const navLinks = [
   { name: 'Home', to: '/' },
   { name: 'Apple Pie Calculator', to: '/apple-pie' },
+  { name: 'Cooking Calculator', to: '/cooking' },
   { name: 'Crop Yield Calculator', to: '/crop-yield' },
   { name: 'Friendship Calculator', to: '/friendship' },
-  { name: 'Cooking Calculator', to: '/cooking' },
-  { name: 'Vault Solver', to: '/vault' },
   { name: 'Production Planner', to: '/production' },
+  { name: 'Vault Solver', to: '/vault' },
 ];
 
 export default function Nav() {

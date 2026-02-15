@@ -111,7 +111,7 @@ function generateAllCodes(): string[] {
   return codes;
 }
 
-const ALL_CODES = generateAllCodes();
+export const ALL_CODES = generateAllCodes();
 
 export function filterCandidates(
   candidates: string[],

@@ -144,6 +144,12 @@
   gap: 4px;
 }
 
+.historyRemaining {
+  font-size: 0.82em;
+  color: var(--color-text-dim);
+  white-space: nowrap;
+}
+
 .historyTile {
   width: 52px;
   height: 34px;

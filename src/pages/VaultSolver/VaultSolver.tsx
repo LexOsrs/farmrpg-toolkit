@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
-import { solveVault, computeFeedback, type VaultGuessEntry, type TileColor, type Feedback } from '../../calculators/vault';
+import { solveVault, computeFeedback, filterCandidates, ALL_CODES, type VaultGuessEntry, type TileColor, type Feedback } from '../../calculators/vault';
 import { formatNumber } from '../../utils/format';
 import Card from '../../components/Card/Card';
 import InfoCard from '../../components/InfoCard/InfoCard';
@@ -72,6 +72,14 @@ export default function VaultSolver() {
     }
     return (1 / result.remainingCount) * 100;
   }, [guessInput, isFullGuess, guesses, result]);
+
+  const remainingPerGuess = useMemo(() => {
+    let candidates = ALL_CODES;
+    return guesses.map(({ guess, feedback: fb }) => {
+      candidates = filterCandidates(candidates, guess, fb);
+      return candidates.length;
+    });
+  }, [guesses]);
 
   const digits = guessInput.padEnd(4, ' ').slice(0, 4).split('');
 
@@ -231,6 +239,9 @@ export default function VaultSolver() {
                 </span>
               ))}
             </div>
+            <span className={styles.historyRemaining}>
+              {formatNumber(remainingPerGuess[i] ?? 0)} left
+            </span>
           </div>
         ))}
       </Card>
