@@ -2,10 +2,23 @@ export function formatNumber(n: number): string {
   return n.toLocaleString('en-US');
 }
 
+const suffixes: [number, string][] = [
+  [1e33, 'D'],
+  [1e30, 'N'],
+  [1e27, 'O'],
+  [1e24, 'S'],
+  [1e21, 's'],
+  [1e18, 'Q'],
+  [1e15, 'q'],
+  [1e12, 'T'],
+  [1e9, 'B'],
+  [1e6, 'M'],
+];
+
 export function formatSilver(n: number): string {
-  if (n >= 1_000_000_000_000) return (n / 1_000_000_000_000).toLocaleString('en-US', { maximumFractionDigits: 3 }) + 'T';
-  if (n >= 1_000_000_000) return (n / 1_000_000_000).toLocaleString('en-US', { maximumFractionDigits: 3 }) + 'B';
-  if (n >= 1_000_000) return (n / 1_000_000).toLocaleString('en-US', { maximumFractionDigits: 3 }) + 'M';
+  for (const [threshold, suffix] of suffixes) {
+    if (n >= threshold) return (n / threshold).toLocaleString('en-US', { maximumFractionDigits: 3 }) + suffix;
+  }
   return n.toLocaleString('en-US');
 }
 

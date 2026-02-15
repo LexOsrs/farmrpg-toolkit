@@ -29,6 +29,13 @@ export default function Nav() {
             {link.name}
           </Link>
         ))}
+        <Link
+          className={`${styles.pill} ${pathname === '/corn' ? styles.pillActive : ''}`}
+          to="/corn"
+          aria-label="Corn Clicker"
+        >
+          🌽
+        </Link>
       </div>
     </nav>
   );
