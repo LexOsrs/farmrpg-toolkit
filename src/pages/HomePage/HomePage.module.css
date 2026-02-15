@@ -1,68 +1,51 @@
-.titleRow {
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.toolCard {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 8px;
+  gap: 14px;
+  padding: 16px 18px;
+  background: var(--color-card-bg);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  text-decoration: none;
+  color: var(--color-text);
+  transition: box-shadow 0.2s, transform 0.15s;
 }
 
-.titleRow h1 {
-  display: flex;
-  align-items: center;
-  margin: 0;
-  padding: 0 2px;
+.toolCard:hover, .toolCard:focus {
+  box-shadow: 0 6px 24px rgba(46,125,79,0.12), 0 2px 8px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
 }
 
-.farmIcon {
-  width: 34px;
-  height: 34px;
-  object-fit: contain;
+.toolEmoji {
+  font-size: 1.8em;
+  flex-shrink: 0;
+  width: 40px;
+  text-align: center;
 }
 
-.appList {
-  margin: 18px 0 0 0;
-  padding: 0;
-  list-style: none;
+.toolText {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 2px;
+  min-width: 0;
 }
 
-.appList li {
-  margin: 0;
-}
-
-.appList a {
-  display: block;
-  background: #eafbee;
-  color: #2e7d4f;
+.toolName {
   font-weight: 600;
-  font-size: 1.08em;
-  padding: 12px 18px;
-  border-radius: 8px;
-  text-decoration: none;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-  position: relative;
+  font-size: 1.05em;
+  color: var(--color-green);
 }
 
-.appList a::after {
-  content: '\2192';
-  position: absolute;
-  right: 18px;
-  top: 50%;
-  transform: translateY(-50%) translateX(-4px);
-  opacity: 0;
-  transition: opacity 0.2s, transform 0.2s;
-}
-
-.appList a:hover, .appList a:focus {
-  background: #b7eac7;
-  color: #1b4d2e;
-  box-shadow: 0 4px 16px rgba(46,125,79,0.08);
-}
-
-.appList a:hover::after, .appList a:focus::after {
-  opacity: 1;
-  transform: translateY(-50%) translateX(0);
+.toolDesc {
+  font-size: 0.88em;
+  color: var(--color-text-muted);
+  line-height: 1.35;
 }

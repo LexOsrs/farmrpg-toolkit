@@ -5,7 +5,6 @@
   border-radius: 0;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   border-bottom: 1px solid rgba(0,0,0,0.06);
-  padding: 2px 0;
   position: fixed;
   top: 0;
   left: 0;
@@ -16,26 +15,16 @@
 .titleRow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 0 8px;
-  min-height: 38px;
-}
-
-.titleLeft {
-  display: flex;
-  align-items: center;
+  padding: 6px 12px 2px;
   gap: 8px;
 }
 
 .titleLink {
-  font-size: 1.45em;
+  font-size: 1.3em;
   font-weight: 700;
-  color: #2e7d4f;
+  color: var(--color-green);
   letter-spacing: 0.01em;
   text-decoration: none;
-  display: inline-block;
-  vertical-align: middle;
   transition: opacity 0.2s;
 }
 
@@ -44,85 +33,52 @@
 }
 
 .farmIcon {
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
   object-fit: contain;
-  vertical-align: middle;
-  margin-right: 8px;
 }
 
-.toggle {
-  display: block;
-  background: none;
-  border: none;
-  cursor: pointer;
-  margin-left: 12px;
-  padding: 6px;
-  border-radius: 6px;
-  transition: background 0.2s;
-}
-
-.toggle:focus {
-  outline: 2px solid var(--color-green);
-  box-shadow: 0 0 0 4px var(--color-focus-green);
-  background: #eafbee;
-}
-
-.overlay {
+.pillBar {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(248, 250, 252, 0.98);
-  z-index: 1000;
-  gap: 32px;
-  transition: opacity 0.25s, visibility 0.25s;
+  gap: 6px;
+  padding: 4px 12px 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
 
-.overlayHidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+.pillBar::-webkit-scrollbar {
+  display: none;
 }
 
-.overlayLink {
-  font-size: 1.4em;
-  padding: 18px 0;
-  color: #2e7d4f;
-  font-weight: 700;
+.pill {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  border-radius: 99px;
+  font-size: 0.82em;
+  font-weight: 500;
   text-decoration: none;
-  border-radius: 8px;
-  width: 80vw;
-  text-align: center;
-  background: #eafbee;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  transition: background 0.2s, color 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: var(--color-text-muted);
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
 }
 
-.overlayLink:hover, .overlayLink:focus {
-  background: #b7eac7;
-  color: #1b4d2e;
+.pill:hover {
+  background: var(--color-green-bg);
+  color: var(--color-green);
+  border-color: var(--color-green);
 }
 
-.closeBtn {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  background: none;
-  border: none;
-  font-size: 2.2em;
-  color: #2e7d4f;
-  cursor: pointer;
-  padding: 0 8px;
-  border-radius: 6px;
-  transition: background 0.2s;
+.pillActive {
+  background: var(--color-green);
+  color: #fff;
+  border-color: var(--color-green);
 }
 
-.closeBtn:focus {
-  background: #eafbee;
+.pillActive:hover {
+  background: var(--color-green-dark);
+  color: #fff;
+  border-color: var(--color-green-dark);
 }

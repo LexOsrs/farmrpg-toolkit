@@ -86,9 +86,9 @@ export default function CropYieldCalc() {
         </RowGroup>
         <div>
           <div className={styles.perksTitle}>Perks</div>
-          <PerkCheckbox id="doublePrizes1" label="Double Prizes I" hint="(15% chance of double crops)"
+          <PerkCheckbox id="doublePrizes1" label="Double Prizes I" hint="(15% double)"
             checked={form.doublePrizes1} onChange={v => update('doublePrizes1', v)} />
-          <PerkCheckbox id="doublePrizes2" label="Double Prizes II" hint="(25% chance of double crops)"
+          <PerkCheckbox id="doublePrizes2" label="Double Prizes II" hint="(25% double)"
             checked={form.doublePrizes2} onChange={v => update('doublePrizes2', v)} />
         </div>
       </Card>

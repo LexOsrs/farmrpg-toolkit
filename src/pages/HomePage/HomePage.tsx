@@ -1,31 +1,27 @@
 import { Link } from 'react-router-dom';
-import Card from '../../components/Card/Card';
 import styles from './HomePage.module.css';
 
 const tools = [
-  { name: 'Apple Pie Calculator', to: '/apple-pie' },
-  { name: 'Cooking Calculator', to: '/cooking' },
-  { name: 'Crop Yield Calculator', to: '/crop-yield' },
-  { name: 'Friendship Calculator', to: '/friendship' },
-  { name: 'Production Planner', to: '/production' },
-  { name: 'Vault Solver', to: '/vault' },
+  { name: 'Apple Pie Calculator', to: '/apple-pie', emoji: '🥧', desc: 'Work out apple pie profits and break-even points.' },
+  { name: 'Cooking Calculator', to: '/cooking', emoji: '🍲', desc: 'XP, timing, and ingredient costs for cooking meals.' },
+  { name: 'Crop Yield Calculator', to: '/crop-yield', emoji: '🌾', desc: 'Expected harvests, seeds, and stamina usage.' },
+  { name: 'Friendship Calculator', to: '/friendship', emoji: '💚', desc: 'Gifts and XP needed to reach friendship levels.' },
+  { name: 'Production Planner', to: '/production', emoji: '🏭', desc: 'Plan building upgrades and see total silver costs.' },
+  { name: 'Vault Solver', to: '/vault', emoji: '🔐', desc: 'Optimal guesses to crack the vault in 5 or fewer tries.' },
 ];
 
 export default function HomePage() {
   return (
-    <>
-      <div className={styles.titleRow}>
-        <img src={import.meta.env.BASE_URL + 'farm_large.png'} alt="Farm" className={styles.farmIcon} />
-        <h1>FarmRPG Toolkit</h1>
-      </div>
-      <Card>
-        <p>Welcome to the FarmRPG Toolkit! Choose a tool from the navigation.</p>
-        <ul className={styles.appList}>
-          {tools.map(tool => (
-            <li key={tool.to}><Link to={tool.to}>{tool.name}</Link></li>
-          ))}
-        </ul>
-      </Card>
-    </>
+    <div className={styles.grid}>
+      {tools.map(tool => (
+        <Link key={tool.to} className={styles.toolCard} to={tool.to}>
+          <span className={styles.toolEmoji}>{tool.emoji}</span>
+          <div className={styles.toolText}>
+            <span className={styles.toolName}>{tool.name}</span>
+            <span className={styles.toolDesc}>{tool.desc}</span>
+          </div>
+        </Link>
+      ))}
+    </div>
   );
 }
