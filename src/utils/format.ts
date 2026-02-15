@@ -2,6 +2,13 @@ export function formatNumber(n: number): string {
   return n.toLocaleString('en-US');
 }
 
+export function formatSilver(n: number): string {
+  if (n >= 1_000_000_000_000) return (n / 1_000_000_000_000).toLocaleString('en-US', { maximumFractionDigits: 3 }) + 'T';
+  if (n >= 1_000_000_000) return (n / 1_000_000_000).toLocaleString('en-US', { maximumFractionDigits: 3 }) + 'B';
+  if (n >= 1_000_000) return (n / 1_000_000).toLocaleString('en-US', { maximumFractionDigits: 3 }) + 'M';
+  return n.toLocaleString('en-US');
+}
+
 export function formatTimeCompact(totalSeconds: number): string {
   if (totalSeconds <= 0) return '0s';
   const h = Math.floor(totalSeconds / 3600);

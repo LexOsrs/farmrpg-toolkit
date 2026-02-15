@@ -8,6 +8,7 @@ const tools = [
   { name: 'Friendship Calculator', to: '/friendship' },
   { name: 'Cooking Calculator', to: '/cooking' },
   { name: 'Vault Solver', to: '/vault' },
+  { name: 'Production Planner', to: '/production' },
 ];
 
 export default function HomePage() {
