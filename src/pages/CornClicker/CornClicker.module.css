@@ -13,6 +13,25 @@
   text-align: center;
 }
 
+.speedBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  align-self: center;
+}
+
+.speedLabel {
+  font-size: 0.8rem;
+  color: var(--color-text-dim);
+  white-space: nowrap;
+  min-width: 70px;
+}
+
+.speedSlider {
+  width: 120px;
+  accent-color: var(--color-green);
+}
+
 .cornButton {
   font-size: 6rem;
   background: none;
@@ -22,6 +41,8 @@
   transition: transform 0.1s;
   line-height: 1;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 .cornButton:active {
@@ -59,26 +80,29 @@
   inset: 0;
   pointer-events: none;
   overflow: visible;
+  z-index: 1;
 }
 
 .particle {
   position: absolute;
+  top: 0;
   font-weight: 700;
   font-size: 1.1rem;
   color: var(--color-green);
   white-space: nowrap;
   animation: floatUp 0.8s ease-out forwards;
   pointer-events: none;
+  transform: translateX(-50%);
 }
 
 @keyframes floatUp {
   0% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateX(-50%) translateY(0) scale(1);
   }
   100% {
     opacity: 0;
-    transform: translateY(-60px) scale(0.7);
+    transform: translateX(-50%) translateY(-60px) scale(0.7);
   }
 }
 
@@ -225,6 +249,94 @@
   text-align: center;
 }
 
+.fieldList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+}
+
+.fieldSeedCount {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-xs);
+}
+
+.fieldRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--color-input-bg);
+}
+
+.fieldInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.fieldName {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.fieldDesc {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.fieldPips {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.fieldPip {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  background: transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.fieldPipFilled {
+  background: #f5c842;
+  border-color: #e6a817;
+}
+
+.fieldBuyBtn {
+  flex-shrink: 0;
+  min-width: 80px;
+  padding: var(--space-xs) var(--space-md);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #f5c842, #e6a817);
+  color: #5a3e00;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  text-align: center;
+  transition: opacity 0.15s;
+}
+
+.fieldBuyBtn:hover {
+  opacity: 0.9;
+}
+
+.fieldBuyBtn:disabled {
+  background: var(--color-border);
+  color: var(--color-text-dim);
+  cursor: not-allowed;
+}
+
 .resetButton {
   background: none;
   border: none;
@@ -250,10 +362,17 @@
   gap: 0;
   margin-bottom: var(--space-sm);
   border-bottom: 2px solid var(--color-border);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.tabBar::-webkit-scrollbar {
+  display: none;
 }
 
 .tabBtn {
-  flex: 1;
+  flex: 0 0 auto;
   padding: var(--space-sm) var(--space-md);
   border: none;
   background: none;
@@ -264,6 +383,7 @@
   border-bottom: 2px solid transparent;
   margin-bottom: -2px;
   transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
 }
 
 .tabBtn:hover {
@@ -375,4 +495,48 @@
   background: var(--color-border);
   color: var(--color-text-dim);
   cursor: not-allowed;
+}
+
+.petList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+}
+
+.petRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--color-input-bg);
+}
+
+.petEmoji {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.petInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.petName {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.petRarity {
+  font-weight: 400;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+}
+
+.petDesc {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
 }
