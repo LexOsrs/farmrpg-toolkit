@@ -13,23 +13,78 @@
   text-align: center;
 }
 
-.speedBar {
+.debugPanel {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-card-bg);
+  overflow: hidden;
+}
+
+.debugToggle {
+  width: 100%;
+  padding: var(--space-xs) var(--space-sm);
+  border: none;
+  background: var(--color-input-bg);
+  color: var(--color-text-dim);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+
+.debugContent {
+  padding: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.debugRow {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-sm);
-  align-self: center;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
 }
 
-.speedLabel {
-  font-size: 0.8rem;
-  color: var(--color-text-dim);
+.debugRow label {
   white-space: nowrap;
-  min-width: 70px;
+  min-width: 80px;
 }
 
-.speedSlider {
-  width: 120px;
+.debugSlider {
+  flex: 1;
   accent-color: var(--color-green);
+}
+
+.debugInput {
+  width: 100px;
+  padding: 2px 4px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-input-bg);
+  color: var(--color-text);
+  font-size: 0.75rem;
+  text-align: right;
+}
+
+.debugDivider {
+  width: 100%;
+  height: 1px;
+  background: var(--color-border);
+  margin: var(--space-xs) 0;
+}
+
+.debugSubtitle {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .cornButton {
@@ -823,4 +878,155 @@
   font-size: 0.75rem;
   color: var(--color-text-dim);
   margin-top: var(--space-md);
+}
+
+/* --- Completed corn glow --- */
+
+.cornCompleted {
+  filter: drop-shadow(0 0 12px #f5c842) drop-shadow(0 0 24px #e6a81766);
+}
+
+/* --- Golden Cornucopia --- */
+
+.cornucopiaSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+.cornucopiaDivider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #f5c842, transparent);
+}
+
+.cornucopiaBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: var(--space-lg) var(--space-md);
+  border: 2px solid #f5c842;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(245, 200, 66, 0.1), rgba(230, 168, 23, 0.05));
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cornucopiaBtn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(245, 200, 66, 0.2), rgba(230, 168, 23, 0.1));
+}
+
+.cornucopiaBtn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.cornucopiaBtn:disabled {
+  border-color: var(--color-border);
+  background: var(--color-input-bg);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.cornucopiaEmoji {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.cornucopiaTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f5c842;
+}
+
+.cornucopiaBtn:disabled .cornucopiaTitle {
+  color: var(--color-text-dim);
+}
+
+.cornucopiaDesc {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+/* --- Completion screen --- */
+
+.completionModal {
+  background: var(--color-card-bg);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl, 2rem);
+  max-width: 340px;
+  width: 100%;
+  box-shadow: 0 0 60px 20px rgba(245, 200, 66, 0.3), var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  text-align: center;
+  animation: revealPop 0.4s ease-out;
+}
+
+.completionEmoji {
+  font-size: 5rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 16px #f5c842);
+}
+
+.completionTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #f5c842;
+}
+
+.completionSubtitle {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.completionStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+  width: 100%;
+  margin-top: var(--space-sm);
+}
+
+.completionStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  background: var(--color-input-bg);
+}
+
+.completionStatValue {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.completionStatLabel {
+  font-size: 0.7rem;
+  color: var(--color-text-dim);
+}
+
+.completionClose {
+  padding: var(--space-sm) var(--space-lg);
+  border: none;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #f5c842, #e6a817);
+  color: #5a3e00;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: var(--space-sm);
+  transition: opacity 0.15s;
+}
+
+.completionClose:hover {
+  opacity: 0.9;
 }

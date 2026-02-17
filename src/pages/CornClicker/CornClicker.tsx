@@ -18,10 +18,12 @@ interface GameState {
   fields: Record<string, number>;
   pets: Record<string, number>;
   crates: number;
+  completed: boolean;
   lastTick: number;
 }
 
 const MAX_OFFLINE_SECONDS = 8 * 60 * 60; // 8 hours
+const CORNUCOPIA_COST = 10_000;
 
 const defaultState: GameState = {
   corn: 0,
@@ -35,6 +37,7 @@ const defaultState: GameState = {
   fields: {},
   pets: {},
   crates: 0,
+  completed: false,
   lastTick: 0,
 };
 
@@ -209,8 +212,9 @@ const achievements: AchievementDef[] = [
   { id: 'max_field', name: 'Field Master', desc: 'Max out a field to level 10', emoji: '🏆', check: s => Object.values(s.fields ?? {}).some(l => l >= FIELD_MAX), visible: s => Object.values(s.fields ?? {}).some(l => l > 0), progress: s => ({ current: Math.max(...Object.values(s.fields ?? {}), 0), target: FIELD_MAX }) },
   { id: 'first_pet', name: 'Animal Friend', desc: 'Get your first pet', emoji: '🐾', check: s => Object.values(s.pets ?? {}).some(l => l > 0), visible: s => (s.totalPrestiges ?? 0) >= 1 },
   { id: 'pets_5', name: 'Petting Zoo', desc: 'Collect 5 different pets', emoji: '🐣', check: s => Object.values(s.pets ?? {}).filter(l => l > 0).length >= 5, visible: s => Object.values(s.pets ?? {}).some(l => l > 0), progress: s => ({ current: Object.values(s.pets ?? {}).filter(l => l > 0).length, target: 5 }) },
-  { id: 'pet_legendary', name: 'Lucky Find', desc: 'Get a legendary pet', emoji: '🪿', check: s => petDefs.filter(p => p.rarity === 'legendary').some(p => (s.pets?.[p.id] ?? 0) > 0), visible: s => Object.values(s.pets ?? {}).some(l => l > 0) },
+  { id: 'pet_legendary', name: 'Lucky Find', desc: 'Get a legendary pet', emoji: '🪿', check: s => petDefs.filter(p => p.rarity === 'legendary').some(p => (s.pets?.[p.id] ?? 0) > 0), visible: () => false },
   { id: 'pets_all', name: 'Full Barn', desc: 'Collect all 10 pets', emoji: '🏅', check: s => petDefs.every(p => (s.pets?.[p.id] ?? 0) > 0), visible: s => Object.values(s.pets ?? {}).some(l => l > 0), progress: s => ({ current: petDefs.filter(p => (s.pets?.[p.id] ?? 0) > 0).length, target: 10 }) },
+  { id: 'completed', name: 'Corn Master', desc: 'Complete the Golden Cornucopia', emoji: '🏆', check: s => s.completed === true, visible: s => fieldDefs.every(f => (s.fields?.[f.id] ?? 0) >= FIELD_MAX) },
 ];
 
 // --- Helpers ---
@@ -269,6 +273,7 @@ export default function CornClicker() {
   const [modal, setModal] = useState<{ title: string; body: string; danger?: boolean; onConfirm: () => void } | null>(null);
   const [petParticles, setPetParticles] = useState<Particle[]>([]);
   const [crate, setCrate] = useState<{ pet: PetDef; level: number; isNew: boolean; phase: 'wiggle' | 'reveal' } | null>(null);
+  const [debugOpenState, setDebugOpenState] = useState(false);
   const stateRef = useRef(state);
   stateRef.current = state;
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -351,6 +356,7 @@ export default function CornClicker() {
 
   // Check achievements
   useEffect(() => {
+    if (debugOpenState) return;
     const newlyEarned = achievements.filter(
       a => !state.achievements.includes(a.id) && a.check(state),
     );
@@ -364,7 +370,7 @@ export default function CornClicker() {
       if (first) showToast(`${first.emoji} Achievement unlocked: ${first.name}!`);
     }
     firstRender.current = false;
-  }, [state.totalCorn, state.totalClicks, state.upgrades, state.achievements, state.fields, state.totalPrestiges, state.goldenSeeds, state.lifetimeSeeds, state.pets, setState, showToast]);
+  }, [state.totalCorn, state.totalClicks, state.upgrades, state.achievements, state.fields, state.totalPrestiges, state.goldenSeeds, state.lifetimeSeeds, state.pets, setState, showToast, debugOpenState]);
 
   // Auto-harvest tick
   useEffect(() => {
@@ -452,10 +458,19 @@ export default function CornClicker() {
     setState(prev => ({
       ...prev,
       crates: (prev.crates ?? 0) - 1,
-      pets: { ...(prev.pets ?? {}), [newPet.id]: (prev.pets?.[newPet.id] ?? 0) + 1 },
     }));
     setCrate({ pet: newPet, level: currentPetLevel + 1, isNew: currentPetLevel === 0, phase: 'wiggle' });
     setTimeout(() => setCrate(prev => prev ? { ...prev, phase: 'reveal' } : null), 1000);
+  };
+
+  const dismissCrate = () => {
+    if (crate) {
+      setState(prev => ({
+        ...prev,
+        pets: { ...(prev.pets ?? {}), [crate.pet.id]: (prev.pets?.[crate.pet.id] ?? 0) + 1 },
+      }));
+    }
+    setCrate(null);
   };
 
   const handleFieldUpgrade = (field: FieldDef) => {
@@ -479,24 +494,114 @@ export default function CornClicker() {
   const seedsOnPrestige = Math.floor(calcGoldenSeeds(state.totalCorn, acreLevel) * petBonuses.seedMult);
   const hasCrates = (state.crates ?? 0) > 0;
   const hasAnyPet = Object.values(state.pets).some(l => l > 0) || hasCrates;
+  const allFieldsMaxed = fieldDefs.every(f => (state.fields[f.id] ?? 0) >= FIELD_MAX);
+  const allPetsCollected = petDefs.every(p => (state.pets[p.id] ?? 0) > 0);
+  const isCompleted = state.completed === true;
+
+  const [showCompletion, setShowCompletion] = useState(false);
+
+  const handleComplete = () => {
+    if (!allFieldsMaxed || !allPetsCollected || spendableSeeds < CORNUCOPIA_COST || isCompleted) return;
+    setState(prev => ({
+      ...prev,
+      goldenSeeds: (prev.goldenSeeds ?? 0) - CORNUCOPIA_COST,
+      completed: true,
+    }));
+    setShowCompletion(true);
+  };
 
   return (
     <div className={styles.page}>
       <div className={styles.title}>Corn Clicker</div>
 
-      {location.hostname === 'localhost' && (
-        <div className={styles.speedBar}>
-          <label className={styles.speedLabel}>Speed: {gameSpeed}x</label>
-          <input
-            type="range"
-            min={1}
-            max={100}
-            value={gameSpeed}
-            onChange={e => setGameSpeed(Number(e.target.value))}
-            className={styles.speedSlider}
-          />
-        </div>
-      )}
+      {location.hostname === 'localhost' && (() => {
+        const [debugOpen, setDebugOpen] = [debugOpenState, setDebugOpenState];
+        return (
+          <div className={styles.debugPanel}>
+            <button className={styles.debugToggle} onClick={() => setDebugOpen(!debugOpen)}>
+              {debugOpen ? '▼' : '▶'} Debug
+            </button>
+            {debugOpen && (
+              <div className={styles.debugContent}>
+                <div className={styles.debugRow}>
+                  <label>Speed: {gameSpeed}x</label>
+                  <input type="range" min={1} max={100} value={gameSpeed} onChange={e => setGameSpeed(Number(e.target.value))} className={styles.debugSlider} />
+                </div>
+                <div className={styles.debugRow}>
+                  <label>Corn</label>
+                  <input type="number" value={Math.floor(state.corn)} onChange={e => setState(prev => ({ ...prev, corn: Number(e.target.value), totalCorn: Math.max(prev.totalCorn, Number(e.target.value)) }))} className={styles.debugInput} />
+                </div>
+                <div className={styles.debugRow}>
+                  <label>Total Corn</label>
+                  <input type="number" value={Math.floor(state.totalCorn)} onChange={e => setState(prev => ({ ...prev, totalCorn: Number(e.target.value) }))} className={styles.debugInput} />
+                </div>
+                <div className={styles.debugRow}>
+                  <label>Golden Seeds</label>
+                  <input type="number" value={state.goldenSeeds} onChange={e => setState(prev => ({ ...prev, goldenSeeds: Number(e.target.value) }))} className={styles.debugInput} />
+                </div>
+                <div className={styles.debugRow}>
+                  <label>Lifetime Seeds</label>
+                  <input type="number" value={state.lifetimeSeeds} onChange={e => setState(prev => ({ ...prev, lifetimeSeeds: Number(e.target.value) }))} className={styles.debugInput} />
+                </div>
+                <div className={styles.debugRow}>
+                  <label>Prestiges</label>
+                  <input type="number" value={state.totalPrestiges} onChange={e => setState(prev => ({ ...prev, totalPrestiges: Number(e.target.value) }))} className={styles.debugInput} />
+                </div>
+                <div className={styles.debugRow}>
+                  <label>Crates</label>
+                  <input type="number" value={state.crates} onChange={e => setState(prev => ({ ...prev, crates: Number(e.target.value) }))} className={styles.debugInput} />
+                </div>
+                <div className={styles.debugRow}>
+                  <label>Clicks</label>
+                  <input type="number" value={state.totalClicks} onChange={e => setState(prev => ({ ...prev, totalClicks: Number(e.target.value) }))} className={styles.debugInput} />
+                </div>
+                <div className={styles.debugDivider} />
+                <div className={styles.debugSubtitle}>Fields</div>
+                {fieldDefs.map(f => (
+                  <div key={f.id} className={styles.debugRow}>
+                    <label>{f.name}</label>
+                    <input type="number" min={0} max={FIELD_MAX} value={state.fields[f.id] ?? 0} onChange={e => setState(prev => ({ ...prev, fields: { ...prev.fields, [f.id]: Math.min(FIELD_MAX, Math.max(0, Number(e.target.value))) } }))} className={styles.debugInput} />
+                  </div>
+                ))}
+                <div className={styles.debugDivider} />
+                <div className={styles.debugSubtitle}>Upgrades</div>
+                {upgrades.map(u => (
+                  <div key={u.id} className={styles.debugRow}>
+                    <label>{u.name}</label>
+                    <input type="number" min={0} value={state.upgrades[u.id] ?? 0} onChange={e => setState(prev => ({ ...prev, upgrades: { ...prev.upgrades, [u.id]: Math.max(0, Number(e.target.value)) } }))} className={styles.debugInput} />
+                  </div>
+                ))}
+                <div className={styles.debugDivider} />
+                <div className={styles.debugSubtitle}>Pets</div>
+                {petDefs.map(p => (
+                  <div key={p.id} className={styles.debugRow}>
+                    <label>{p.emoji} {p.name}</label>
+                    <input type="number" min={0} value={state.pets[p.id] ?? 0} onChange={e => setState(prev => ({ ...prev, pets: { ...prev.pets, [p.id]: Math.max(0, Number(e.target.value)) } }))} className={styles.debugInput} />
+                  </div>
+                ))}
+                <div className={styles.debugDivider} />
+                <div className={styles.debugSubtitle}>Achievements</div>
+                {achievements.map(a => (
+                  <div key={a.id} className={styles.debugRow}>
+                    <label>{a.emoji} {a.name}</label>
+                    <input type="checkbox" checked={state.achievements.includes(a.id)} onChange={e => setState(prev => ({
+                      ...prev,
+                      achievements: e.target.checked
+                        ? [...(prev.achievements ?? []), a.id]
+                        : (prev.achievements ?? []).filter(id => id !== a.id),
+                    }))} />
+                  </div>
+                ))}
+                <div className={styles.debugDivider} />
+                <div className={styles.debugRow}>
+                  <label>Completed</label>
+                  <input type="checkbox" checked={state.completed} onChange={e => setState(prev => ({ ...prev, completed: e.target.checked }))} />
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       <Card>
         <div className={styles.cornArea}>
@@ -507,7 +612,7 @@ export default function CornClicker() {
               </span>
             ))}
           </div>
-          <button className={styles.cornButton} onClick={handleClick} aria-label="Harvest corn">
+          <button className={`${styles.cornButton} ${isCompleted ? styles.cornCompleted : ''}`} onClick={handleClick} aria-label="Harvest corn">
             🌽
           </button>
           <div className={styles.counter}>{formatSilver(Math.floor(state.corn))} corn</div>
@@ -654,7 +759,7 @@ export default function CornClicker() {
         {tab === 'prestige' && (
           <div className={styles.prestigePanel}>
             <div className={styles.prestigeNote}>
-              Prestiging resets your corn and upgrades, but earns you Golden Seeds. Spend seeds in the Fields tab on permanent bonuses. You'll also receive a random pet each time!
+              Prestiging resets your corn and upgrades, but earns you Golden Seeds. Spend seeds in the Fields tab on permanent bonuses. You'll also receive a pet crate each time!
             </div>
             <div className={styles.prestigeDivider} />
             <div className={styles.prestigeInfo}>
@@ -728,6 +833,37 @@ export default function CornClicker() {
                 </div>
               );
             })}
+            <div className={styles.cornucopiaSection}>
+              <div className={styles.cornucopiaDivider} />
+              {isCompleted ? (
+                <button className={styles.cornucopiaBtn} onClick={() => setShowCompletion(true)}>
+                  <span className={styles.cornucopiaEmoji}>🌽</span>
+                  <span className={styles.cornucopiaTitle}>Golden Cornucopia</span>
+                  <span className={styles.cornucopiaDesc}>Complete! Tap to view.</span>
+                </button>
+              ) : !allFieldsMaxed ? (
+                <button className={styles.cornucopiaBtn} disabled>
+                  <span className={styles.cornucopiaEmoji}>❓</span>
+                  <span className={styles.cornucopiaTitle}>???</span>
+                  <span className={styles.cornucopiaDesc}>🌟 {formatSilver(CORNUCOPIA_COST)}</span>
+                </button>
+              ) : (
+                <button
+                  className={styles.cornucopiaBtn}
+                  disabled={spendableSeeds < CORNUCOPIA_COST || !allPetsCollected}
+                  onClick={handleComplete}
+                >
+                  <span className={styles.cornucopiaEmoji}>🌽</span>
+                  <span className={styles.cornucopiaTitle}>Golden Cornucopia</span>
+                  <span className={styles.cornucopiaDesc}>
+                    {!allPetsCollected
+                      ? `Collect all pets · 🌟 ${formatSilver(CORNUCOPIA_COST)}`
+                      : `The ultimate harvest · 🌟 ${formatSilver(CORNUCOPIA_COST)}`
+                    }
+                  </span>
+                </button>
+              )}
+            </div>
           </div>
         )}
 
@@ -837,7 +973,7 @@ export default function CornClicker() {
       )}
 
       {crate && (
-        <div className={styles.modalOverlay} onClick={crate.phase === 'reveal' ? () => setCrate(null) : undefined}>
+        <div className={styles.modalOverlay} onClick={crate.phase === 'reveal' ? dismissCrate : undefined}>
           <div className={styles.crateBox} onClick={e => e.stopPropagation()}>
             {crate.phase === 'wiggle' && (
               <div className={styles.crateWiggle}>📦</div>
@@ -847,12 +983,12 @@ export default function CornClicker() {
               const lvl = crate.level;
               const prevLvl = lvl - 1;
               const bonusParts: string[] = [];
-              if (p.clickMult > 0) bonusParts.push(`+${(p.clickMult * 100)}% click`);
-              if (p.idleMult > 0) bonusParts.push(`+${(p.idleMult * 100)}% idle`);
-              if (p.seedMult > 0) bonusParts.push(`+${(p.seedMult * 100)}% seeds`);
+              if (p.clickMult > 0) bonusParts.push(`+${Math.round(p.clickMult * 100)}% click`);
+              if (p.idleMult > 0) bonusParts.push(`+${Math.round(p.idleMult * 100)}% idle`);
+              if (p.seedMult > 0) bonusParts.push(`+${Math.round(p.seedMult * 100)}% seeds`);
               const bonusPerLevel = bonusParts.join(', ');
               return (
-              <div className={styles.crateReveal} onClick={() => setCrate(null)}>
+              <div className={styles.crateReveal} onClick={dismissCrate}>
                 <div
                   className={styles.crateGlow}
                   style={{ boxShadow: `0 0 40px 15px ${rarityColors[p.rarity]}` }}
@@ -874,7 +1010,7 @@ export default function CornClicker() {
                       {bonusParts.map((part, i) => {
                         const mult = [p.clickMult, p.idleMult, p.seedMult].filter(m => m > 0)[i] ?? 0;
                         const label = part.split(' ').slice(1).join(' ');
-                        return <div key={i}>+{(mult * prevLvl * 100)}% → +{(mult * lvl * 100)}% {label}</div>;
+                        return <div key={i}>+{Math.round(mult * prevLvl * 100)}% → +{Math.round(mult * lvl * 100)}% {label}</div>;
                       })}
                     </div>
                   </div>
@@ -883,6 +1019,41 @@ export default function CornClicker() {
               </div>
               );
             })()}
+          </div>
+        </div>
+      )}
+
+      {showCompletion && (
+        <div className={styles.modalOverlay} onClick={() => setShowCompletion(false)}>
+          <div className={styles.completionModal} onClick={e => e.stopPropagation()}>
+            <div className={styles.completionEmoji}>🌽</div>
+            <div className={styles.completionTitle}>You've mastered corn!</div>
+            <div className={styles.completionSubtitle}>Golden Cornucopia complete</div>
+            <div className={styles.completionStats}>
+              <div className={styles.completionStat}>
+                <span className={styles.completionStatValue}>{formatSilver(Math.floor(state.totalCorn))}</span>
+                <span className={styles.completionStatLabel}>total corn</span>
+              </div>
+              <div className={styles.completionStat}>
+                <span className={styles.completionStatValue}>{formatSilver(state.totalClicks)}</span>
+                <span className={styles.completionStatLabel}>clicks</span>
+              </div>
+              <div className={styles.completionStat}>
+                <span className={styles.completionStatValue}>{state.totalPrestiges}</span>
+                <span className={styles.completionStatLabel}>prestiges</span>
+              </div>
+              <div className={styles.completionStat}>
+                <span className={styles.completionStatValue}>{petDefs.filter(p => (state.pets[p.id] ?? 0) > 0).length}/{petDefs.length}</span>
+                <span className={styles.completionStatLabel}>pets found</span>
+              </div>
+              <div className={styles.completionStat}>
+                <span className={styles.completionStatValue}>{state.achievements.length}/{achievements.length}</span>
+                <span className={styles.completionStatLabel}>achievements</span>
+              </div>
+            </div>
+            <button className={styles.completionClose} onClick={() => setShowCompletion(false)}>
+              Continue farming
+            </button>
           </div>
         </div>
       )}
