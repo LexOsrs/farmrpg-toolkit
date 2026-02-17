@@ -43,9 +43,13 @@ const defaultState: GameState = {
 
 const acreMultipliers = [0, 0.2, 0.5, 1, 2, 4, 7, 10, 15, 20, 30];
 
+function calcBaseSeeds(totalCorn: number): number {
+  return Math.floor(Math.sqrt(totalCorn / 100_000));
+}
+
 function calcGoldenSeeds(totalCorn: number, goldenAcreLevel: number): number {
   const bonus = 1 + (acreMultipliers[goldenAcreLevel] ?? 0);
-  return Math.floor(Math.sqrt(totalCorn / 100_000) * bonus);
+  return Math.floor(calcBaseSeeds(totalCorn) * bonus);
 }
 
 
@@ -789,11 +793,19 @@ export default function CornClicker() {
               <div className={styles.prestigeStat}>
                 <span className={styles.prestigeLabel}>Seeds on prestige</span>
                 <span className={styles.prestigeValue}>
-                  {seedsOnPrestige > 0 ? `+${seedsOnPrestige}` : '0 (need 100K corn)'}
+                  +{seedsOnPrestige}
                   {' '}
-                  <span className={styles.prestigeLabel}>
-                    (next at {formatSilver(Math.ceil(((seedsOnPrestige + 1) / (acreBonus * petBonuses.seedMult)) ** 2 * 100_000))})
-                  </span>
+                  {(() => {
+                    const nextBase = calcBaseSeeds(state.totalCorn) + 1;
+                    const nextCorn = nextBase ** 2 * 100_000;
+                    const nextSeeds = Math.floor(nextBase * acreBonus * petBonuses.seedMult);
+                    const gain = nextSeeds - seedsOnPrestige;
+                    return (
+                      <span className={styles.prestigeLabel}>
+                        (next +{gain} at {formatSilver(nextCorn)} corn)
+                      </span>
+                    );
+                  })()}
                 </span>
               </div>
             </div>
@@ -804,7 +816,7 @@ export default function CornClicker() {
             >
               {seedsOnPrestige > 0
                 ? `Prestige for ${seedsOnPrestige} Golden Seed${seedsOnPrestige === 1 ? '' : 's'}`
-                : 'Earn 100K corn to prestige'
+                : `Earn ${formatSilver(100_000)} corn to prestige`
               }
             </button>
             <div className={styles.prestigeNote}>
