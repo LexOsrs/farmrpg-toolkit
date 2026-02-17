@@ -593,6 +593,52 @@
   transition: transform 0.1s;
 }
 
+.crateHero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: var(--space-lg) var(--space-md);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-input-bg);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.crateHero:hover {
+  border-color: var(--color-green);
+  background: var(--color-green-bg);
+}
+
+.crateHero:active {
+  transform: scale(0.97);
+}
+
+.crateHeroEmoji {
+  font-size: 3.5rem;
+  line-height: 1;
+  animation: gentleBounce 2s ease-in-out infinite;
+}
+
+@keyframes gentleBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.crateHeroCount {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.crateHeroAction {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
 .modalOverlay {
   position: fixed;
   inset: 0;
@@ -670,4 +716,111 @@
   composes: modalConfirm;
   background: var(--color-loss);
   color: #fff;
+}
+
+.crateBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+}
+
+.crateWiggle {
+  font-size: 5rem;
+  animation: wiggle 0.3s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-8deg) scale(1.05); }
+  75% { transform: rotate(8deg) scale(1.05); }
+}
+
+.crateReveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  animation: revealPop 0.4s ease-out;
+  position: relative;
+  cursor: pointer;
+  background: var(--color-card-bg);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg) var(--space-xl, 2rem);
+  box-shadow: var(--shadow-card);
+}
+
+@keyframes revealPop {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.crateGlow {
+  position: absolute;
+  top: 20px;
+  width: 1px;
+  height: 1px;
+  border-radius: 50%;
+  animation: glowPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.cratePetEmoji {
+  font-size: 4rem;
+  line-height: 1;
+  position: relative;
+}
+
+.cratePetName {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.cratePetRarity {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.crateDetail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: var(--space-xs);
+}
+
+.crateNew {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--color-green);
+  padding: 2px var(--space-sm);
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.05em;
+}
+
+.crateLevelUp {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.crateBonusDesc {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.crateDismiss {
+  font-size: 0.75rem;
+  color: var(--color-text-dim);
+  margin-top: var(--space-md);
 }

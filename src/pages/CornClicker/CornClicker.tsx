@@ -17,6 +17,7 @@ interface GameState {
   totalPrestiges: number;
   fields: Record<string, number>;
   pets: Record<string, number>;
+  crates: number;
   lastTick: number;
 }
 
@@ -33,6 +34,7 @@ const defaultState: GameState = {
   totalPrestiges: 0,
   fields: {},
   pets: {},
+  crates: 0,
   lastTick: 0,
 };
 
@@ -208,7 +210,7 @@ const achievements: AchievementDef[] = [
   { id: 'first_pet', name: 'Animal Friend', desc: 'Get your first pet', emoji: '🐾', check: s => Object.values(s.pets ?? {}).some(l => l > 0), visible: s => (s.totalPrestiges ?? 0) >= 1 },
   { id: 'pets_5', name: 'Petting Zoo', desc: 'Collect 5 different pets', emoji: '🐣', check: s => Object.values(s.pets ?? {}).filter(l => l > 0).length >= 5, visible: s => Object.values(s.pets ?? {}).some(l => l > 0), progress: s => ({ current: Object.values(s.pets ?? {}).filter(l => l > 0).length, target: 5 }) },
   { id: 'pet_legendary', name: 'Lucky Find', desc: 'Get a legendary pet', emoji: '🪿', check: s => petDefs.filter(p => p.rarity === 'legendary').some(p => (s.pets?.[p.id] ?? 0) > 0), visible: s => Object.values(s.pets ?? {}).some(l => l > 0) },
-  { id: 'pets_all', name: 'Full Barn', desc: 'Collect all 10 pets', emoji: '🏅', check: s => petDefs.every(p => (s.pets?.[p.id] ?? 0) > 0), visible: s => Object.values(s.pets ?? {}).filter(l => l > 0).length >= 5, progress: s => ({ current: petDefs.filter(p => (s.pets?.[p.id] ?? 0) > 0).length, target: 10 }) },
+  { id: 'pets_all', name: 'Full Barn', desc: 'Collect all 10 pets', emoji: '🏅', check: s => petDefs.every(p => (s.pets?.[p.id] ?? 0) > 0), visible: s => Object.values(s.pets ?? {}).some(l => l > 0), progress: s => ({ current: petDefs.filter(p => (s.pets?.[p.id] ?? 0) > 0).length, target: 10 }) },
 ];
 
 // --- Helpers ---
@@ -216,6 +218,7 @@ const achievements: AchievementDef[] = [
 interface Particle {
   id: number;
   x: number;
+  y?: number;
   text: string;
 }
 
@@ -265,6 +268,7 @@ export default function CornClicker() {
   const [gameSpeed, setGameSpeed] = useState(1);
   const [modal, setModal] = useState<{ title: string; body: string; danger?: boolean; onConfirm: () => void } | null>(null);
   const [petParticles, setPetParticles] = useState<Particle[]>([]);
+  const [crate, setCrate] = useState<{ pet: PetDef; level: number; isNew: boolean; phase: 'wiggle' | 'reveal' } | null>(null);
   const stateRef = useRef(state);
   stateRef.current = state;
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -419,12 +423,10 @@ export default function CornClicker() {
     const petBonus = getPetBonuses(state.pets ?? {});
     const seedsToEarn = Math.floor(calcGoldenSeeds(state.totalCorn, acreLevel) * petBonus.seedMult);
     if (seedsToEarn <= 0) return;
-    const newPet = rollPet();
     setModal({
       title: `🌟 Prestige for ${seedsToEarn} Golden Seed${seedsToEarn === 1 ? '' : 's'}?`,
-      body: `Your corn and upgrades will be reset, but you'll earn ${seedsToEarn} Golden Seed${seedsToEarn === 1 ? '' : 's'} and a new pet! Achievements, fields, and pets are kept.`,
+      body: `Your corn and upgrades will be reset, but you'll earn ${seedsToEarn} Golden Seed${seedsToEarn === 1 ? '' : 's'} and a pet crate! Achievements, fields, and pets are kept.`,
       onConfirm: () => {
-        const currentPetLevel = state.pets?.[newPet.id] ?? 0;
         setState(prev => ({
           ...defaultState,
           achievements: prev.achievements ?? [],
@@ -432,15 +434,28 @@ export default function CornClicker() {
           lifetimeSeeds: (prev.lifetimeSeeds ?? 0) + seedsToEarn,
           totalPrestiges: (prev.totalPrestiges ?? 0) + 1,
           fields: prev.fields ?? {},
-          pets: { ...(prev.pets ?? {}), [newPet.id]: (prev.pets?.[newPet.id] ?? 0) + 1 },
+          pets: prev.pets ?? {},
+          crates: (prev.crates ?? 0) + 1,
           lastTick: Date.now(),
         }));
         firstRender.current = true;
-        const levelText = currentPetLevel > 0 ? ` (now lvl ${currentPetLevel + 1})` : '';
-        showToast(`🌟 +${seedsToEarn} seeds! ${newPet.emoji} Got ${newPet.name}${levelText}!`);
+        showToast(`🌟 +${seedsToEarn} Golden Seeds! 📦 +1 Pet Crate!`);
         setModal(null);
       },
     });
+  };
+
+  const handleOpenCrate = () => {
+    if ((state.crates ?? 0) <= 0) return;
+    const newPet = rollPet();
+    const currentPetLevel = state.pets?.[newPet.id] ?? 0;
+    setState(prev => ({
+      ...prev,
+      crates: (prev.crates ?? 0) - 1,
+      pets: { ...(prev.pets ?? {}), [newPet.id]: (prev.pets?.[newPet.id] ?? 0) + 1 },
+    }));
+    setCrate({ pet: newPet, level: currentPetLevel + 1, isNew: currentPetLevel === 0, phase: 'wiggle' });
+    setTimeout(() => setCrate(prev => prev ? { ...prev, phase: 'reveal' } : null), 1000);
   };
 
   const handleFieldUpgrade = (field: FieldDef) => {
@@ -462,7 +477,8 @@ export default function CornClicker() {
   const spendableSeeds = state.goldenSeeds ?? 0;
   const petBonuses = getPetBonuses(state.pets ?? {});
   const seedsOnPrestige = Math.floor(calcGoldenSeeds(state.totalCorn, acreLevel) * petBonuses.seedMult);
-  const hasAnyPet = Object.values(state.pets).some(l => l > 0);
+  const hasCrates = (state.crates ?? 0) > 0;
+  const hasAnyPet = Object.values(state.pets).some(l => l > 0) || hasCrates;
 
   return (
     <div className={styles.page}>
@@ -531,7 +547,7 @@ export default function CornClicker() {
               onClick={() => setTab('pets')}
             >
               <span className={styles.tabEmoji}>🐾</span>
-              <span className={styles.tabLabel}>Pets</span>
+              <span className={styles.tabLabel}>{hasCrates ? `📦${state.crates}` : 'Pets'}</span>
             </button>
           )}
           <button
@@ -568,6 +584,8 @@ export default function CornClicker() {
                   : buyAmount;
                 const cost = getBulkCost(def, owned, count, costMult);
                 const canAfford = count > 0 && state.corn >= cost;
+                const nextCost = getCost(def, owned, costMult);
+                const fillPct = canAfford ? 100 : Math.min(100, Math.floor((state.corn / nextCost) * 100));
                 return (
                   <div key={def.id} className={styles.upgradeRow}>
                     <div className={styles.upgradeInfo}>
@@ -584,6 +602,9 @@ export default function CornClicker() {
                       className={styles.buyButton}
                       disabled={!canAfford}
                       onClick={() => handleBuy(def)}
+                      style={!canAfford ? {
+                        background: `linear-gradient(to right, var(--color-green) ${fillPct}%, transparent ${fillPct}%) bottom / 100% 3px no-repeat, var(--color-border)`,
+                      } : undefined}
                     >
                       {buyAmount === 'max'
                         ? count > 0 ? `${formatSilver(cost)} (x${count})` : `${formatSilver(getCost(def, owned, costMult))} (x1)`
@@ -713,12 +734,19 @@ export default function CornClicker() {
         {tab === 'pets' && (
           <div className={styles.petList}>
             <div className={styles.prestigeNote}>
-              Pets are earned each time you prestige. Duplicates level up, making their bonus stronger. Rarer pets give bigger boosts to clicking, idle production, or Golden Seed earnings.
+              Prestige to earn pet crates. Tap a crate to open it! Duplicates level up, making their bonus stronger. Rarer pets give bigger boosts.
             </div>
+            {hasCrates && (
+              <button className={styles.crateHero} onClick={handleOpenCrate}>
+                <span className={styles.crateHeroEmoji}>📦</span>
+                <span className={styles.crateHeroCount}>{state.crates} crate{state.crates !== 1 ? 's' : ''}</span>
+                <span className={styles.crateHeroAction}>Tap to open!</span>
+              </button>
+            )}
             <div className={styles.petListInner}>
               <div className={styles.particleContainer}>
                 {petParticles.map(p => (
-                  <span key={p.id} className={styles.particle} style={{ left: `${p.x}%` }}>
+                  <span key={p.id} className={styles.particle} style={{ left: p.x, top: p.y ?? 0 }}>
                     {p.text}
                   </span>
                 ))}
@@ -738,10 +766,16 @@ export default function CornClicker() {
                   <div
                     key={pet.id}
                     className={`${styles.petRow} ${styles.petRowTappable}`}
-                    onClick={() => {
+                    onClick={(e) => {
+                      const emoji = e.currentTarget.querySelector(`.${styles.petEmoji}`);
+                      const container = e.currentTarget.parentElement;
+                      if (!emoji || !container) return;
+                      const cRect = container.getBoundingClientRect();
+                      const eRect = emoji.getBoundingClientRect();
+                      const x = eRect.left - cRect.left + eRect.width / 2;
+                      const y = eRect.top - cRect.top;
                       const id = ++particleId;
-                      const x = 20 + Math.random() * 60;
-                      setPetParticles(prev => [...prev.slice(-2), { id, x, text: pet.noise }]);
+                      setPetParticles(prev => [...prev.slice(-2), { id, x, y, text: pet.noise }]);
                       setTimeout(() => setPetParticles(prev => prev.filter(p => p.id !== id)), 800);
                     }}
                   >
@@ -798,6 +832,57 @@ export default function CornClicker() {
                 {modal.danger ? 'Reset' : 'Prestige'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {crate && (
+        <div className={styles.modalOverlay} onClick={crate.phase === 'reveal' ? () => setCrate(null) : undefined}>
+          <div className={styles.crateBox} onClick={e => e.stopPropagation()}>
+            {crate.phase === 'wiggle' && (
+              <div className={styles.crateWiggle}>📦</div>
+            )}
+            {crate.phase === 'reveal' && (() => {
+              const p = crate.pet;
+              const lvl = crate.level;
+              const prevLvl = lvl - 1;
+              const bonusParts: string[] = [];
+              if (p.clickMult > 0) bonusParts.push(`+${(p.clickMult * 100)}% click`);
+              if (p.idleMult > 0) bonusParts.push(`+${(p.idleMult * 100)}% idle`);
+              if (p.seedMult > 0) bonusParts.push(`+${(p.seedMult * 100)}% seeds`);
+              const bonusPerLevel = bonusParts.join(', ');
+              return (
+              <div className={styles.crateReveal} onClick={() => setCrate(null)}>
+                <div
+                  className={styles.crateGlow}
+                  style={{ boxShadow: `0 0 40px 15px ${rarityColors[p.rarity]}` }}
+                />
+                <div className={styles.cratePetEmoji}>{p.emoji}</div>
+                <div className={styles.cratePetName}>{p.name}</div>
+                <div className={styles.cratePetRarity} style={{ color: rarityColors[p.rarity] }}>
+                  {p.rarity}
+                </div>
+                {crate.isNew ? (
+                  <div className={styles.crateDetail}>
+                    <div className={styles.crateNew}>NEW</div>
+                    <div className={styles.crateBonusDesc}>{bonusPerLevel} per level</div>
+                  </div>
+                ) : (
+                  <div className={styles.crateDetail}>
+                    <div className={styles.crateLevelUp}>Level {prevLvl} → {lvl}</div>
+                    <div className={styles.crateBonusDesc}>
+                      {bonusParts.map((part, i) => {
+                        const mult = [p.clickMult, p.idleMult, p.seedMult].filter(m => m > 0)[i] ?? 0;
+                        const label = part.split(' ').slice(1).join(' ');
+                        return <div key={i}>+{(mult * prevLvl * 100)}% → +{(mult * lvl * 100)}% {label}</div>;
+                      })}
+                    </div>
+                  </div>
+                )}
+                <div className={styles.crateDismiss}>Tap to continue</div>
+              </div>
+              );
+            })()}
           </div>
         </div>
       )}
