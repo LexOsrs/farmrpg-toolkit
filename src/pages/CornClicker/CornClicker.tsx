@@ -313,14 +313,11 @@ export default function CornClicker() {
     toastTimer.current = setTimeout(() => setToast(null), 4500);
   }, []);
 
-  // Offline progress on mount
-  const offlineProcessed = useRef(false);
-  useEffect(() => {
-    if (offlineProcessed.current) return;
-    offlineProcessed.current = true;
-    const last = state.lastTick;
+  // Offline / background progress
+  const processOffline = useCallback(() => {
+    const s = stateRef.current;
+    const last = s.lastTick;
     if (last <= 0) {
-      // First session — just set the timestamp
       setState(prev => ({ ...prev, lastTick: Date.now() }));
       return;
     }
@@ -329,10 +326,10 @@ export default function CornClicker() {
       setState(prev => ({ ...prev, lastTick: Date.now() }));
       return;
     }
-    const ps = getPerSecond(state);
-    const gLevel = state.fields?.['grove'] ?? 0;
+    const ps = getPerSecond(s);
+    const gLevel = s.fields?.['grove'] ?? 0;
     const autoClicks = groveAutoClicks[gLevel] ?? 0;
-    const clickPwr = autoClicks > 0 ? getClickPower(state) * autoClicks : 0;
+    const clickPwr = autoClicks > 0 ? getClickPower(s) * autoClicks : 0;
     const perSec = ps + clickPwr;
     const earned = perSec * elapsed;
     if (earned > 0) {
@@ -351,8 +348,23 @@ export default function CornClicker() {
     } else {
       setState(prev => ({ ...prev, lastTick: Date.now() }));
     }
+  }, [setState, getPerSecond, getClickPower, showToast]);
+
+  const offlineProcessed = useRef(false);
+  useEffect(() => {
+    if (offlineProcessed.current) return;
+    offlineProcessed.current = true;
+    processOffline();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') processOffline();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, [processOffline]);
 
   // Check achievements
   useEffect(() => {
