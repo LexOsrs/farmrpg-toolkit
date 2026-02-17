@@ -454,17 +454,19 @@ export default function CornClicker() {
     <div className={styles.page}>
       <div className={styles.title}>Corn Clicker</div>
 
-      <div className={styles.speedBar}>
-        <label className={styles.speedLabel}>Speed: {gameSpeed}x</label>
-        <input
-          type="range"
-          min={1}
-          max={100}
-          value={gameSpeed}
-          onChange={e => setGameSpeed(Number(e.target.value))}
-          className={styles.speedSlider}
-        />
-      </div>
+      {location.hostname === 'localhost' && (
+        <div className={styles.speedBar}>
+          <label className={styles.speedLabel}>Speed: {gameSpeed}x</label>
+          <input
+            type="range"
+            min={1}
+            max={100}
+            value={gameSpeed}
+            onChange={e => setGameSpeed(Number(e.target.value))}
+            className={styles.speedSlider}
+          />
+        </div>
+      )}
 
       <Card>
         <div className={styles.cornArea}>
