@@ -13,6 +13,7 @@ interface GameState {
   upgrades: Record<string, number>;
   achievements: string[];
   goldenSeeds: number;
+  lifetimeSeeds: number;
   totalPrestiges: number;
   fields: Record<string, number>;
   pets: Record<string, number>;
@@ -28,20 +29,20 @@ const defaultState: GameState = {
   upgrades: {},
   achievements: [],
   goldenSeeds: 0,
+  lifetimeSeeds: 0,
   totalPrestiges: 0,
   fields: {},
   pets: {},
   lastTick: 0,
 };
 
+const acreMultipliers = [0, 0.2, 0.5, 1, 2, 4, 7, 10, 15, 20, 30];
+
 function calcGoldenSeeds(totalCorn: number, goldenAcreLevel: number): number {
-  const bonus = 1 + ([0, 0.2, 0.5, 1, 2, 4][goldenAcreLevel] ?? 0);
+  const bonus = 1 + (acreMultipliers[goldenAcreLevel] ?? 0);
   return Math.floor(Math.sqrt(totalCorn / 100_000) * bonus);
 }
 
-function goldenSeedMultiplier(seeds: number): number {
-  return 1.2 ** seeds;
-}
 
 // --- Upgrades ---
 
@@ -75,31 +76,34 @@ interface FieldDef {
   costs: number[];
 }
 
+const FIELD_MAX = 10;
+const fieldCosts = [1, 2, 4, 8, 15, 25, 40, 60, 85, 120];
+
 const fieldDefs: FieldDef[] = [
   {
     id: 'meadow', name: 'Sunny Meadow', emoji: '☀️',
-    desc: (l) => l === 0 ? 'Passive corn/sec through prestige' : `+${[0, 1, 3, 8, 20, 50][l]}/sec (persists through prestige)`,
-    costs: [3, 8, 15, 25, 40],
+    desc: (l) => l === 0 ? 'Passive corn/sec through prestige' : `+${formatSilver([0, 1, 3, 8, 20, 50, 100, 200, 500, 1000, 2500][l] ?? 0)}/sec (persists through prestige)`,
+    costs: fieldCosts,
   },
   {
     id: 'valley', name: 'Fertile Valley', emoji: '🌿',
-    desc: (l) => l === 0 ? 'Multiply click power' : `${[0, 1.5, 2, 3, 5, 8][l]}x click power`,
-    costs: [3, 8, 15, 25, 40],
+    desc: (l) => l === 0 ? 'Multiply click power' : `${[0, 1.5, 2, 3, 5, 8, 12, 18, 25, 35, 50][l]}x click power`,
+    costs: fieldCosts,
   },
   {
     id: 'acre', name: 'Golden Acre', emoji: '✨',
-    desc: (l) => l === 0 ? 'Bonus Golden Seeds on prestige' : `+${[0, 20, 50, 100, 200, 400][l]}% seeds on prestige`,
-    costs: [5, 12, 20, 35, 50],
+    desc: (l) => l === 0 ? 'Bonus Golden Seeds on prestige' : `+${[0, 20, 50, 100, 200, 400, 700, 1000, 1500, 2000, 3000][l] ?? 0}% seeds on prestige`,
+    costs: fieldCosts,
   },
   {
     id: 'moon', name: 'Harvest Moon', emoji: '🌙',
-    desc: (l) => l === 0 ? 'Reduce upgrade costs' : `-${[0, 10, 20, 30, 40, 50][l]}% upgrade costs`,
-    costs: [3, 8, 15, 25, 40],
+    desc: (l) => l === 0 ? 'Reduce upgrade costs' : `-${[0, 5, 10, 15, 20, 30, 40, 50, 60, 70, 80][l]}% upgrade costs`,
+    costs: fieldCosts,
   },
   {
     id: 'grove', name: 'Enchanted Grove', emoji: '🌳',
-    desc: (l) => l === 0 ? 'Auto-clicks per second' : `${[0, 1, 2, 3, 5, 8][l]} auto-clicks/sec`,
-    costs: [5, 12, 20, 35, 50],
+    desc: (l) => l === 0 ? 'Auto-clicks per second' : `${[0, 1, 2, 3, 5, 8, 12, 18, 25, 35, 50][l]} auto-clicks/sec`,
+    costs: fieldCosts,
   },
 ];
 
@@ -111,6 +115,7 @@ interface PetDef {
   id: string;
   name: string;
   emoji: string;
+  noise: string;
   rarity: Rarity;
   bonusDesc: string;
   clickMult: number;
@@ -119,16 +124,16 @@ interface PetDef {
 }
 
 const petDefs: PetDef[] = [
-  { id: 'chicken', name: 'Chicken', emoji: '🐔', rarity: 'common', bonusDesc: '+5% click/lvl', clickMult: 0.05, idleMult: 0, seedMult: 0 },
-  { id: 'cat', name: 'Barn Cat', emoji: '🐱', rarity: 'common', bonusDesc: '+5% idle/lvl', clickMult: 0, idleMult: 0.05, seedMult: 0 },
-  { id: 'mouse', name: 'Field Mouse', emoji: '🐭', rarity: 'common', bonusDesc: '+3% all/lvl', clickMult: 0.03, idleMult: 0.03, seedMult: 0 },
-  { id: 'dog', name: 'Sheepdog', emoji: '🐕', rarity: 'uncommon', bonusDesc: '+10% idle/lvl', clickMult: 0, idleMult: 0.1, seedMult: 0 },
-  { id: 'goat', name: 'Goat', emoji: '🐐', rarity: 'uncommon', bonusDesc: '+10% click/lvl', clickMult: 0.1, idleMult: 0, seedMult: 0 },
-  { id: 'pig', name: 'Pig', emoji: '🐷', rarity: 'uncommon', bonusDesc: '+8% seeds/lvl', clickMult: 0, idleMult: 0, seedMult: 0.08 },
-  { id: 'cow', name: 'Cow', emoji: '🐄', rarity: 'rare', bonusDesc: '+10% all/lvl', clickMult: 0.1, idleMult: 0.1, seedMult: 0 },
-  { id: 'horse', name: 'Horse', emoji: '🐴', rarity: 'rare', bonusDesc: '+15% idle/lvl', clickMult: 0, idleMult: 0.15, seedMult: 0 },
-  { id: 'owl', name: 'Owl', emoji: '🦉', rarity: 'rare', bonusDesc: '+15% seeds/lvl', clickMult: 0, idleMult: 0, seedMult: 0.15 },
-  { id: 'goose', name: 'Golden Goose', emoji: '🪿', rarity: 'legendary', bonusDesc: '+20% all/lvl', clickMult: 0.2, idleMult: 0.2, seedMult: 0.2 },
+  { id: 'chicken', name: 'Chicken', emoji: '🐔', noise: 'Cluck!', rarity: 'common', bonusDesc: '+5% click/lvl', clickMult: 0.05, idleMult: 0, seedMult: 0 },
+  { id: 'cat', name: 'Barn Cat', emoji: '🐱', noise: 'Meow!', rarity: 'common', bonusDesc: '+5% idle/lvl', clickMult: 0, idleMult: 0.05, seedMult: 0 },
+  { id: 'mouse', name: 'Field Mouse', emoji: '🐭', noise: 'Squeak!', rarity: 'common', bonusDesc: '+3% all/lvl', clickMult: 0.03, idleMult: 0.03, seedMult: 0 },
+  { id: 'dog', name: 'Sheepdog', emoji: '🐕', noise: 'Woof!', rarity: 'uncommon', bonusDesc: '+10% idle/lvl', clickMult: 0, idleMult: 0.1, seedMult: 0 },
+  { id: 'goat', name: 'Goat', emoji: '🐐', noise: 'Baa!', rarity: 'uncommon', bonusDesc: '+10% click/lvl', clickMult: 0.1, idleMult: 0, seedMult: 0 },
+  { id: 'pig', name: 'Pig', emoji: '🐷', noise: 'Oink!', rarity: 'uncommon', bonusDesc: '+8% seeds/lvl', clickMult: 0, idleMult: 0, seedMult: 0.08 },
+  { id: 'cow', name: 'Cow', emoji: '🐄', noise: 'Moo!', rarity: 'rare', bonusDesc: '+10% all/lvl', clickMult: 0.1, idleMult: 0.1, seedMult: 0 },
+  { id: 'horse', name: 'Horse', emoji: '🐴', noise: 'Neigh!', rarity: 'rare', bonusDesc: '+15% idle/lvl', clickMult: 0, idleMult: 0.15, seedMult: 0 },
+  { id: 'owl', name: 'Owl', emoji: '🦉', noise: 'Hoot!', rarity: 'rare', bonusDesc: '+15% seeds/lvl', clickMult: 0, idleMult: 0, seedMult: 0.15 },
+  { id: 'goose', name: 'Golden Goose', emoji: '🪿', noise: 'Honk!', rarity: 'legendary', bonusDesc: '+20% all/lvl', clickMult: 0.2, idleMult: 0.2, seedMult: 0.2 },
 ];
 
 const rarityWeights: Record<Rarity, number> = { common: 50, uncommon: 30, rare: 15, legendary: 5 };
@@ -161,10 +166,10 @@ function getPetBonuses(pets: Record<string, number>) {
   return { clickMult, idleMult, seedMult };
 }
 
-const meadowPerSec = [0, 1, 3, 8, 20, 50];
-const valleyClickMult = [1, 1.5, 2, 3, 5, 8];
-const moonCostReduction = [1, 0.9, 0.8, 0.7, 0.6, 0.5];
-const groveAutoClicks = [0, 1, 2, 3, 5, 8];
+const meadowPerSec = [0, 1, 3, 8, 20, 50, 100, 200, 500, 1000, 2500];
+const valleyClickMult = [1, 1.5, 2, 3, 5, 8, 12, 18, 25, 35, 50];
+const moonCostReduction = [1, 0.95, 0.9, 0.85, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2];
+const groveAutoClicks = [0, 1, 2, 3, 5, 8, 12, 18, 25, 35, 50];
 
 // --- Achievements ---
 
@@ -175,34 +180,35 @@ interface AchievementDef {
   emoji: string;
   check: (s: GameState) => boolean;
   visible?: (s: GameState) => boolean;
+  progress?: (s: GameState) => { current: number; target: number };
 }
 
 const achievements: AchievementDef[] = [
-  { id: 'first_corn', name: 'Baby Steps', desc: 'Harvest your first corn', emoji: '🌱', check: s => s.totalCorn >= 1 },
-  { id: 'corn_100', name: 'Handful', desc: 'Earn 100 total corn', emoji: '🧺', check: s => s.totalCorn >= 100 },
-  { id: 'corn_1k', name: 'Bushel', desc: 'Earn 1,000 total corn', emoji: '🌾', check: s => s.totalCorn >= 1_000 },
-  { id: 'corn_10k', name: 'Cornucopia', desc: 'Earn 10,000 total corn', emoji: '🎉', check: s => s.totalCorn >= 10_000 },
-  { id: 'corn_100k', name: 'Corn Baron', desc: 'Earn 100,000 total corn', emoji: '🏰', check: s => s.totalCorn >= 100_000 },
-  { id: 'corn_1m', name: 'Corn Mogul', desc: 'Earn 1 million total corn', emoji: '💰', check: s => s.totalCorn >= 1_000_000 },
-  { id: 'corn_1b', name: 'Corn Tycoon', desc: 'Earn 1 billion total corn', emoji: '👑', check: s => s.totalCorn >= 1_000_000_000 },
-  { id: 'clicks_100', name: 'Clicker', desc: 'Click 100 times', emoji: '👆', check: s => s.totalClicks >= 100 },
-  { id: 'clicks_1k', name: 'Rapid Fire', desc: 'Click 1,000 times', emoji: '⚡', check: s => s.totalClicks >= 1_000 },
-  { id: 'clicks_10k', name: 'Carpal Tunnel', desc: 'Click 10,000 times', emoji: '🦾', check: s => s.totalClicks >= 10_000 },
+  { id: 'first_corn', name: 'Baby Steps', desc: 'Harvest your first corn', emoji: '🌱', check: s => s.totalCorn >= 1, progress: s => ({ current: Math.min(s.totalCorn, 1), target: 1 }) },
+  { id: 'corn_100', name: 'Handful', desc: 'Earn 100 total corn', emoji: '🧺', check: s => s.totalCorn >= 100, progress: s => ({ current: Math.min(s.totalCorn, 100), target: 100 }) },
+  { id: 'corn_1k', name: 'Bushel', desc: 'Earn 1,000 total corn', emoji: '🌾', check: s => s.totalCorn >= 1_000, progress: s => ({ current: Math.min(s.totalCorn, 1_000), target: 1_000 }) },
+  { id: 'corn_10k', name: 'Cornucopia', desc: 'Earn 10,000 total corn', emoji: '🎉', check: s => s.totalCorn >= 10_000, progress: s => ({ current: Math.min(s.totalCorn, 10_000), target: 10_000 }) },
+  { id: 'corn_100k', name: 'Corn Baron', desc: 'Earn 100,000 total corn', emoji: '🏰', check: s => s.totalCorn >= 100_000, progress: s => ({ current: Math.min(s.totalCorn, 100_000), target: 100_000 }) },
+  { id: 'corn_1m', name: 'Corn Mogul', desc: 'Earn 1 million total corn', emoji: '💰', check: s => s.totalCorn >= 1_000_000, progress: s => ({ current: Math.min(s.totalCorn, 1_000_000), target: 1_000_000 }) },
+  { id: 'corn_1b', name: 'Corn Tycoon', desc: 'Earn 1 billion total corn', emoji: '👑', check: s => s.totalCorn >= 1_000_000_000, progress: s => ({ current: Math.min(s.totalCorn, 1_000_000_000), target: 1_000_000_000 }) },
+  { id: 'clicks_100', name: 'Clicker', desc: 'Click 100 times', emoji: '👆', check: s => s.totalClicks >= 100, progress: s => ({ current: Math.min(s.totalClicks, 100), target: 100 }) },
+  { id: 'clicks_1k', name: 'Rapid Fire', desc: 'Click 1,000 times', emoji: '⚡', check: s => s.totalClicks >= 1_000, progress: s => ({ current: Math.min(s.totalClicks, 1_000), target: 1_000 }) },
+  { id: 'clicks_10k', name: 'Carpal Tunnel', desc: 'Click 10,000 times', emoji: '🦾', check: s => s.totalClicks >= 10_000, progress: s => ({ current: Math.min(s.totalClicks, 10_000), target: 10_000 }) },
   { id: 'buy_basket', name: 'Upgrade!', desc: 'Buy your first upgrade', emoji: '🛒', check: s => (s.upgrades['basket'] ?? 0) >= 1 },
   { id: 'buy_scarecrow', name: 'Idle Farmer', desc: 'Buy a Scarecrow', emoji: '🧑‍🌾', check: s => (s.upgrades['scarecrow'] ?? 0) >= 1, visible: s => (s.upgrades['basket'] ?? 0) >= 1 },
   { id: 'buy_tractor', name: 'Mechanized', desc: 'Buy a Tractor', emoji: '🚜', check: s => (s.upgrades['tractor'] ?? 0) >= 1, visible: s => (s.upgrades['fertilizer'] ?? 0) >= 1 },
   { id: 'buy_cookie', name: 'Boosted', desc: 'Buy a Cookie Boost', emoji: '🍪', check: s => (s.upgrades['cookieboost'] ?? 0) >= 1, visible: s => (s.upgrades['megaseeds'] ?? 0) >= 1 },
-  { id: 'ten_baskets', name: 'Big Baskets', desc: 'Own 10 Bigger Baskets', emoji: '🧺', check: s => (s.upgrades['basket'] ?? 0) >= 10 },
-  { id: 'ten_scarecrows', name: 'Scarecrow Army', desc: 'Own 10 Scarecrows', emoji: '🎃', check: s => (s.upgrades['scarecrow'] ?? 0) >= 10, visible: s => (s.upgrades['basket'] ?? 0) >= 1 },
+  { id: 'ten_baskets', name: 'Big Baskets', desc: 'Own 10 Bigger Baskets', emoji: '🧺', check: s => (s.upgrades['basket'] ?? 0) >= 10, progress: s => ({ current: Math.min(s.upgrades['basket'] ?? 0, 10), target: 10 }) },
+  { id: 'ten_scarecrows', name: 'Scarecrow Army', desc: 'Own 10 Scarecrows', emoji: '🎃', check: s => (s.upgrades['scarecrow'] ?? 0) >= 10, visible: s => (s.upgrades['basket'] ?? 0) >= 1, progress: s => ({ current: Math.min(s.upgrades['scarecrow'] ?? 0, 10), target: 10 }) },
   { id: 'prestige_1', name: 'Golden Harvest', desc: 'Prestige for the first time', emoji: '🌟', check: s => (s.totalPrestiges ?? 0) >= 1, visible: s => s.totalCorn >= 50_000 },
-  { id: 'prestige_5', name: 'Serial Farmer', desc: 'Prestige 5 times', emoji: '✨', check: s => (s.totalPrestiges ?? 0) >= 5, visible: s => (s.totalPrestiges ?? 0) >= 1 },
-  { id: 'seeds_10', name: 'Seed Hoarder', desc: 'Accumulate 10 Golden Seeds', emoji: '💫', check: s => (s.goldenSeeds ?? 0) >= 10, visible: s => (s.goldenSeeds ?? 0) >= 1 },
+  { id: 'prestige_5', name: 'Serial Farmer', desc: 'Prestige 5 times', emoji: '✨', check: s => (s.totalPrestiges ?? 0) >= 5, visible: s => (s.totalPrestiges ?? 0) >= 1, progress: s => ({ current: Math.min(s.totalPrestiges ?? 0, 5), target: 5 }) },
+  { id: 'seeds_10', name: 'Seed Hoarder', desc: 'Earn 10 lifetime Golden Seeds', emoji: '💫', check: s => (s.lifetimeSeeds ?? 0) >= 10, visible: s => (s.lifetimeSeeds ?? 0) >= 1, progress: s => ({ current: Math.min(s.lifetimeSeeds ?? 0, 10), target: 10 }) },
   { id: 'first_field', name: 'Landowner', desc: 'Upgrade a field for the first time', emoji: '🏡', check: s => Object.values(s.fields ?? {}).some(l => l > 0), visible: s => (s.goldenSeeds ?? 0) >= 1 },
-  { id: 'max_field', name: 'Field Master', desc: 'Max out a field to level 5', emoji: '🏆', check: s => Object.values(s.fields ?? {}).some(l => l >= 5), visible: s => Object.values(s.fields ?? {}).some(l => l > 0) },
+  { id: 'max_field', name: 'Field Master', desc: 'Max out a field to level 10', emoji: '🏆', check: s => Object.values(s.fields ?? {}).some(l => l >= FIELD_MAX), visible: s => Object.values(s.fields ?? {}).some(l => l > 0), progress: s => ({ current: Math.max(...Object.values(s.fields ?? {}), 0), target: FIELD_MAX }) },
   { id: 'first_pet', name: 'Animal Friend', desc: 'Get your first pet', emoji: '🐾', check: s => Object.values(s.pets ?? {}).some(l => l > 0), visible: s => (s.totalPrestiges ?? 0) >= 1 },
-  { id: 'pets_5', name: 'Petting Zoo', desc: 'Collect 5 different pets', emoji: '🐣', check: s => Object.values(s.pets ?? {}).filter(l => l > 0).length >= 5, visible: s => Object.values(s.pets ?? {}).some(l => l > 0) },
+  { id: 'pets_5', name: 'Petting Zoo', desc: 'Collect 5 different pets', emoji: '🐣', check: s => Object.values(s.pets ?? {}).filter(l => l > 0).length >= 5, visible: s => Object.values(s.pets ?? {}).some(l => l > 0), progress: s => ({ current: Object.values(s.pets ?? {}).filter(l => l > 0).length, target: 5 }) },
   { id: 'pet_legendary', name: 'Lucky Find', desc: 'Get a legendary pet', emoji: '🪿', check: s => petDefs.filter(p => p.rarity === 'legendary').some(p => (s.pets?.[p.id] ?? 0) > 0), visible: s => Object.values(s.pets ?? {}).some(l => l > 0) },
-  { id: 'pets_all', name: 'Full Barn', desc: 'Collect all 10 pets', emoji: '🏅', check: s => petDefs.every(p => (s.pets?.[p.id] ?? 0) > 0), visible: s => Object.values(s.pets ?? {}).filter(l => l > 0).length >= 5 },
+  { id: 'pets_all', name: 'Full Barn', desc: 'Collect all 10 pets', emoji: '🏅', check: s => petDefs.every(p => (s.pets?.[p.id] ?? 0) > 0), visible: s => Object.values(s.pets ?? {}).filter(l => l > 0).length >= 5, progress: s => ({ current: petDefs.filter(p => (s.pets?.[p.id] ?? 0) > 0).length, target: 10 }) },
 ];
 
 // --- Helpers ---
@@ -243,18 +249,22 @@ type Tab = 'upgrades' | 'achievements' | 'prestige' | 'fields' | 'pets';
 
 export default function CornClicker() {
   const [rawState, setState] = useLocalStorage<GameState>('corn-clicker', defaultState);
+  const raw = rawState ?? {};
   const state: GameState = {
     ...defaultState,
-    ...(rawState ?? {}),
-    achievements: rawState?.achievements ?? defaultState.achievements,
-    fields: rawState?.fields ?? defaultState.fields,
-    pets: rawState?.pets ?? defaultState.pets,
+    ...raw,
+    achievements: raw.achievements ?? defaultState.achievements,
+    fields: raw.fields ?? defaultState.fields,
+    pets: raw.pets ?? defaultState.pets,
+    lifetimeSeeds: raw.lifetimeSeeds ?? (raw.goldenSeeds ?? 0),
   };
   const [buyAmount, setBuyAmount] = useState<BuyAmount>(1);
   const [tab, setTab] = useState<Tab>('upgrades');
   const [particles, setParticles] = useState<Particle[]>([]);
   const [toast, setToast] = useState<string | null>(null);
   const [gameSpeed, setGameSpeed] = useState(1);
+  const [modal, setModal] = useState<{ title: string; body: string; danger?: boolean; onConfirm: () => void } | null>(null);
+  const [petParticles, setPetParticles] = useState<Particle[]>([]);
   const stateRef = useRef(state);
   stateRef.current = state;
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -263,6 +273,7 @@ export default function CornClicker() {
   const costMult = moonCostReduction[state.fields['moon'] ?? 0] ?? 1;
   const groveLevel = state.fields['grove'] ?? 0;
   const acreLevel = state.fields['acre'] ?? 0;
+  const acreBonus = 1 + (acreMultipliers[acreLevel] ?? 0);
 
   const getClickPower = useCallback((s: GameState) => {
     const vLevel = s.fields?.['valley'] ?? 0;
@@ -271,7 +282,7 @@ export default function CornClicker() {
     for (const u of upgrades) {
       if (u.perClick) power += u.perClick * (s.upgrades[u.id] ?? 0);
     }
-    return Math.floor(power * goldenSeedMultiplier(s.goldenSeeds ?? 0) * (valleyClickMult[vLevel] ?? 1) * petBonus.clickMult);
+    return Math.floor(power * (valleyClickMult[vLevel] ?? 1) * petBonus.clickMult);
   }, []);
 
   const getPerSecond = useCallback((s: GameState) => {
@@ -284,7 +295,7 @@ export default function CornClicker() {
       if (u.perSecond) base += u.perSecond * owned;
       if (u.multiplier) multiplier *= u.multiplier ** owned;
     }
-    return Math.floor(base * multiplier * goldenSeedMultiplier(s.goldenSeeds ?? 0) * petBonus.idleMult);
+    return Math.floor(base * multiplier * petBonus.idleMult);
   }, []);
 
   const showToast = useCallback((msg: string) => {
@@ -349,7 +360,7 @@ export default function CornClicker() {
       if (first) showToast(`${first.emoji} Achievement unlocked: ${first.name}!`);
     }
     firstRender.current = false;
-  }, [state.totalCorn, state.totalClicks, state.upgrades, state.achievements, state.fields, state.totalPrestiges, state.goldenSeeds, state.pets, setState, showToast]);
+  }, [state.totalCorn, state.totalClicks, state.upgrades, state.achievements, state.fields, state.totalPrestiges, state.goldenSeeds, state.lifetimeSeeds, state.pets, setState, showToast]);
 
   // Auto-harvest tick
   useEffect(() => {
@@ -409,26 +420,32 @@ export default function CornClicker() {
     const seedsToEarn = Math.floor(calcGoldenSeeds(state.totalCorn, acreLevel) * petBonus.seedMult);
     if (seedsToEarn <= 0) return;
     const newPet = rollPet();
-    if (!window.confirm(
-      `Prestige for ${seedsToEarn} Golden Seed${seedsToEarn === 1 ? '' : 's'}? You'll also get a pet! This resets your corn and upgrades.`
-    )) return;
-    const currentPetLevel = state.pets?.[newPet.id] ?? 0;
-    setState(prev => ({
-      ...defaultState,
-      achievements: prev.achievements ?? [],
-      goldenSeeds: (prev.goldenSeeds ?? 0) + seedsToEarn,
-      totalPrestiges: (prev.totalPrestiges ?? 0) + 1,
-      fields: prev.fields ?? {},
-      pets: { ...(prev.pets ?? {}), [newPet.id]: (prev.pets?.[newPet.id] ?? 0) + 1 },
-    }));
-    firstRender.current = true;
-    const levelText = currentPetLevel > 0 ? ` (now lvl ${currentPetLevel + 1})` : '';
-    showToast(`🌟 +${seedsToEarn} seeds! ${newPet.emoji} Got ${newPet.name}${levelText}!`);
+    setModal({
+      title: `🌟 Prestige for ${seedsToEarn} Golden Seed${seedsToEarn === 1 ? '' : 's'}?`,
+      body: `Your corn and upgrades will be reset, but you'll earn ${seedsToEarn} Golden Seed${seedsToEarn === 1 ? '' : 's'} and a new pet! Achievements, fields, and pets are kept.`,
+      onConfirm: () => {
+        const currentPetLevel = state.pets?.[newPet.id] ?? 0;
+        setState(prev => ({
+          ...defaultState,
+          achievements: prev.achievements ?? [],
+          goldenSeeds: (prev.goldenSeeds ?? 0) + seedsToEarn,
+          lifetimeSeeds: (prev.lifetimeSeeds ?? 0) + seedsToEarn,
+          totalPrestiges: (prev.totalPrestiges ?? 0) + 1,
+          fields: prev.fields ?? {},
+          pets: { ...(prev.pets ?? {}), [newPet.id]: (prev.pets?.[newPet.id] ?? 0) + 1 },
+          lastTick: Date.now(),
+        }));
+        firstRender.current = true;
+        const levelText = currentPetLevel > 0 ? ` (now lvl ${currentPetLevel + 1})` : '';
+        showToast(`🌟 +${seedsToEarn} seeds! ${newPet.emoji} Got ${newPet.name}${levelText}!`);
+        setModal(null);
+      },
+    });
   };
 
   const handleFieldUpgrade = (field: FieldDef) => {
     const level = state.fields[field.id] ?? 0;
-    if (level >= 5) return;
+    if (level >= FIELD_MAX) return;
     const cost = field.costs[level];
     if (cost === undefined || state.goldenSeeds < cost) return;
     setState(prev => ({
@@ -442,13 +459,10 @@ export default function CornClicker() {
   const perSecond = getPerSecond(state);
   const autoClicksPerSec = groveAutoClicks[groveLevel] ?? 0;
   const earnedCount = state.achievements.length;
-  const currentSeeds = state.goldenSeeds ?? 0;
+  const spendableSeeds = state.goldenSeeds ?? 0;
   const petBonuses = getPetBonuses(state.pets ?? {});
   const seedsOnPrestige = Math.floor(calcGoldenSeeds(state.totalCorn, acreLevel) * petBonuses.seedMult);
-  const currentMultiplier = goldenSeedMultiplier(currentSeeds);
-  const nextMultiplier = goldenSeedMultiplier(currentSeeds + seedsOnPrestige);
   const hasAnyPet = Object.values(state.pets).some(l => l > 0);
-  const totalPetLevels = Object.values(state.pets).reduce((a, b) => a + b, 0);
 
   return (
     <div className={styles.page}>
@@ -494,34 +508,39 @@ export default function CornClicker() {
             className={`${styles.tabBtn} ${tab === 'upgrades' ? styles.tabActive : ''}`}
             onClick={() => setTab('upgrades')}
           >
-            Upgrades
-          </button>
-          <button
-            className={`${styles.tabBtn} ${tab === 'achievements' ? styles.tabActive : ''}`}
-            onClick={() => setTab('achievements')}
-          >
-            Achievements ({earnedCount}/{achievements.length})
+            <span className={styles.tabEmoji}>⬆️</span>
+            <span className={styles.tabLabel}>Upgrades</span>
           </button>
           <button
             className={`${styles.tabBtn} ${tab === 'prestige' ? styles.tabActive : ''}`}
             onClick={() => setTab('prestige')}
           >
-            Prestige{currentSeeds > 0 ? ` (${currentSeeds})` : ''}
+            <span className={styles.tabEmoji}>🌟</span>
+            <span className={styles.tabLabel}>{spendableSeeds > 0 ? spendableSeeds : 'Prestige'}</span>
           </button>
           <button
             className={`${styles.tabBtn} ${tab === 'fields' ? styles.tabActive : ''}`}
             onClick={() => setTab('fields')}
           >
-            Fields
+            <span className={styles.tabEmoji}>🌾</span>
+            <span className={styles.tabLabel}>Fields</span>
           </button>
           {hasAnyPet && (
             <button
               className={`${styles.tabBtn} ${tab === 'pets' ? styles.tabActive : ''}`}
               onClick={() => setTab('pets')}
             >
-              Pets ({totalPetLevels})
+              <span className={styles.tabEmoji}>🐾</span>
+              <span className={styles.tabLabel}>Pets</span>
             </button>
           )}
+          <button
+            className={`${styles.tabBtn} ${tab === 'achievements' ? styles.tabActive : ''}`}
+            onClick={() => setTab('achievements')}
+          >
+            <span className={styles.tabEmoji}>🏆</span>
+            <span className={styles.tabLabel}>{earnedCount}/{achievements.length}</span>
+          </button>
         </div>
 
         <div className={styles.tabContent}>
@@ -567,8 +586,8 @@ export default function CornClicker() {
                       onClick={() => handleBuy(def)}
                     >
                       {buyAmount === 'max'
-                        ? count > 0 ? `${formatSilver(cost)} (x${count})` : 'Max'
-                        : count > 1 ? `${formatSilver(cost)} (x${count})` : `${formatSilver(cost)}`
+                        ? count > 0 ? `${formatSilver(cost)} (x${count})` : `${formatSilver(getCost(def, owned, costMult))} (x1)`
+                        : count > 1 ? `${formatSilver(cost)} (x${count})` : `${formatSilver(getBulkCost(def, owned, buyAmount, costMult))}`
                       }
                     </button>
                   </div>
@@ -583,6 +602,8 @@ export default function CornClicker() {
             {achievements.map(a => {
               const earned = state.achievements.includes(a.id);
               const visible = earned || !a.visible || a.visible(state);
+              const prog = !earned && visible && a.progress ? a.progress(state) : null;
+              const pct = prog ? Math.min(100, Math.floor((prog.current / prog.target) * 100)) : 0;
               return (
                 <div
                   key={a.id}
@@ -592,6 +613,16 @@ export default function CornClicker() {
                   <div className={styles.achievementText}>
                     <span className={styles.achievementName}>{visible ? a.name : '???'}</span>
                     <span className={styles.achievementDesc}>{visible ? a.desc : '???'}</span>
+                    {prog && (
+                      <div className={styles.achievementProgress}>
+                        <div className={styles.progressBar}>
+                          <div className={styles.progressFill} style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className={styles.progressText}>
+                          {formatSilver(Math.floor(prog.current))}/{formatSilver(prog.target)}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -602,17 +633,13 @@ export default function CornClicker() {
         {tab === 'prestige' && (
           <div className={styles.prestigePanel}>
             <div className={styles.prestigeNote}>
-              Prestiging resets your corn and upgrades, but earns you Golden Seeds that multiply all production. You'll also receive a random pet each time! Seeds can be spent in the Fields tab on permanent bonuses.
+              Prestiging resets your corn and upgrades, but earns you Golden Seeds. Spend seeds in the Fields tab on permanent bonuses. You'll also receive a random pet each time!
             </div>
             <div className={styles.prestigeDivider} />
             <div className={styles.prestigeInfo}>
               <div className={styles.prestigeStat}>
                 <span className={styles.prestigeLabel}>Golden Seeds</span>
-                <span className={styles.prestigeValue}>🌟 {currentSeeds}</span>
-              </div>
-              <div className={styles.prestigeStat}>
-                <span className={styles.prestigeLabel}>Current bonus</span>
-                <span className={styles.prestigeValue}>{currentMultiplier.toFixed(1)}x</span>
+                <span className={styles.prestigeValue}>🌟 {spendableSeeds}</span>
               </div>
               <div className={styles.prestigeStat}>
                 <span className={styles.prestigeLabel}>Total corn this run</span>
@@ -625,14 +652,12 @@ export default function CornClicker() {
                 <span className={styles.prestigeLabel}>Seeds on prestige</span>
                 <span className={styles.prestigeValue}>
                   {seedsOnPrestige > 0 ? `+${seedsOnPrestige}` : '0 (need 100K corn)'}
+                  {' '}
+                  <span className={styles.prestigeLabel}>
+                    (next at {formatSilver(Math.ceil(((seedsOnPrestige + 1) / (acreBonus * petBonuses.seedMult)) ** 2 * 100_000))})
+                  </span>
                 </span>
               </div>
-              {seedsOnPrestige > 0 && (
-                <div className={styles.prestigeStat}>
-                  <span className={styles.prestigeLabel}>New bonus</span>
-                  <span className={styles.prestigeValue}>{nextMultiplier.toFixed(1)}x</span>
-                </div>
-              )}
             </div>
             <button
               className={styles.prestigeButton}
@@ -652,19 +677,19 @@ export default function CornClicker() {
 
         {tab === 'fields' && (
           <div className={styles.fieldList}>
-            <div className={styles.fieldSeedCount}>🌟 {currentSeeds} Golden Seeds available</div>
+            <div className={styles.fieldSeedCount}>🌟 {spendableSeeds} Golden Seeds available</div>
             {fieldDefs.map(field => {
               const level = state.fields[field.id] ?? 0;
-              const maxed = level >= 5;
+              const maxed = level >= FIELD_MAX;
               const cost = maxed ? 0 : (field.costs[level] ?? 0);
-              const canAfford = !maxed && currentSeeds >= cost;
+              const canAfford = !maxed && spendableSeeds >= cost;
               return (
                 <div key={field.id} className={styles.fieldRow}>
                   <div className={styles.fieldInfo}>
                     <span className={styles.fieldName}>{field.emoji} {field.name}</span>
                     <span className={styles.fieldDesc}>{field.desc(level)}</span>
                     <div className={styles.fieldPips}>
-                      {[1, 2, 3, 4, 5].map(i => (
+                      {Array.from({ length: FIELD_MAX }, (_, i) => i + 1).map(i => (
                         <span
                           key={i}
                           className={`${styles.fieldPip} ${i <= level ? styles.fieldPipFilled : ''}`}
@@ -690,32 +715,50 @@ export default function CornClicker() {
             <div className={styles.prestigeNote}>
               Pets are earned each time you prestige. Duplicates level up, making their bonus stronger. Rarer pets give bigger boosts to clicking, idle production, or Golden Seed earnings.
             </div>
-            {petDefs.map(pet => {
-              const level = state.pets[pet.id] ?? 0;
-              if (level === 0) return (
-                <div key={pet.id} className={styles.petRow}>
-                  <span className={styles.petEmoji}>❓</span>
-                  <div className={styles.petInfo}>
-                    <span className={styles.petName} style={{ color: '#aaa' }}>???</span>
-                    <span className={styles.petDesc}>???</span>
+            <div className={styles.petListInner}>
+              <div className={styles.particleContainer}>
+                {petParticles.map(p => (
+                  <span key={p.id} className={styles.particle} style={{ left: `${p.x}%` }}>
+                    {p.text}
+                  </span>
+                ))}
+              </div>
+              {petDefs.map(pet => {
+                const level = state.pets[pet.id] ?? 0;
+                if (level === 0) return (
+                  <div key={pet.id} className={styles.petRow}>
+                    <span className={styles.petEmoji}>❓</span>
+                    <div className={styles.petInfo}>
+                      <span className={styles.petName} style={{ color: '#aaa' }}>???</span>
+                      <span className={styles.petDesc}>???</span>
+                    </div>
                   </div>
-                </div>
-              );
-              return (
-                <div key={pet.id} className={styles.petRow}>
-                  <span className={styles.petEmoji}>{pet.emoji}</span>
-                  <div className={styles.petInfo}>
-                    <span className={styles.petName}>
-                      {pet.name}
-                      <span className={styles.petRarity} style={{ color: rarityColors[pet.rarity] }}>
-                        {' '}{pet.rarity}
+                );
+                return (
+                  <div
+                    key={pet.id}
+                    className={`${styles.petRow} ${styles.petRowTappable}`}
+                    onClick={() => {
+                      const id = ++particleId;
+                      const x = 20 + Math.random() * 60;
+                      setPetParticles(prev => [...prev.slice(-2), { id, x, text: pet.noise }]);
+                      setTimeout(() => setPetParticles(prev => prev.filter(p => p.id !== id)), 800);
+                    }}
+                  >
+                    <span className={styles.petEmoji}>{pet.emoji}</span>
+                    <div className={styles.petInfo}>
+                      <span className={styles.petName}>
+                        {pet.name}
+                        <span className={styles.petRarity} style={{ color: rarityColors[pet.rarity] }}>
+                          {' '}{pet.rarity}
+                        </span>
                       </span>
-                    </span>
-                    <span className={styles.petDesc}>Lvl {level} · {pet.bonusDesc}</span>
+                      <span className={styles.petDesc}>Lvl {level} · {pet.bonusDesc}</span>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         )}
         </div>
@@ -724,16 +767,40 @@ export default function CornClicker() {
       <button
         className={styles.resetButton}
         onClick={() => {
-          if (window.confirm('Reset all Corn Clicker progress? This cannot be undone.')) {
-            setState(defaultState);
-            firstRender.current = true;
-          }
+          setModal({
+            title: 'Reset all progress?',
+            body: 'This will permanently delete all your corn, upgrades, achievements, seeds, fields, and pets. This cannot be undone.',
+            danger: true,
+            onConfirm: () => {
+              setState(defaultState);
+              firstRender.current = true;
+              setModal(null);
+            },
+          });
         }}
       >
         Reset all progress
       </button>
 
       {toast && <div className={styles.toast}>{toast}</div>}
+
+      {modal && (
+        <div className={styles.modalOverlay} onClick={() => setModal(null)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalTitle}>{modal.title}</div>
+            <div className={styles.modalBody}>{modal.body}</div>
+            <div className={styles.modalActions}>
+              <button className={styles.modalCancel} onClick={() => setModal(null)}>Cancel</button>
+              <button
+                className={modal.danger ? styles.modalConfirmDanger : styles.modalConfirm}
+                onClick={modal.onConfirm}
+              >
+                {modal.danger ? 'Reset' : 'Prestige'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
