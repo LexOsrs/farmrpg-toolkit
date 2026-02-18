@@ -274,6 +274,7 @@ export default function CornClicker() {
   const [particles, setParticles] = useState<Particle[]>([]);
   const [toast, setToast] = useState<string | null>(null);
   const [gameSpeed, setGameSpeed] = useState(1);
+  const [flashIds, setFlashIds] = useState<Set<string>>(new Set());
   const [modal, setModal] = useState<{ title: string; body: string; danger?: boolean; onConfirm: () => void } | null>(null);
   const [petParticles, setPetParticles] = useState<Particle[]>([]);
   const [crate, setCrate] = useState<{ pet: PetDef; level: number; isNew: boolean; phase: 'wiggle' | 'reveal' } | null>(null);
@@ -309,6 +310,11 @@ export default function CornClicker() {
       if (u.multiplier) multiplier *= u.multiplier ** owned;
     }
     return Math.floor(base * multiplier * petBonus.idleMult);
+  }, []);
+
+  const triggerFlash = useCallback((id: string) => {
+    setFlashIds(prev => new Set(prev).add(id));
+    setTimeout(() => setFlashIds(prev => { const n = new Set(prev); n.delete(id); return n; }), 400);
   }, []);
 
   const showToast = useCallback((msg: string) => {
@@ -442,6 +448,7 @@ export default function CornClicker() {
       corn: prev.corn - cost,
       upgrades: { ...prev.upgrades, [def.id]: (prev.upgrades[def.id] ?? 0) + count },
     }));
+    triggerFlash(def.id);
   };
 
   const handlePrestige = () => {
@@ -502,6 +509,7 @@ export default function CornClicker() {
       goldenSeeds: (prev.goldenSeeds ?? 0) - cost,
       fields: { ...(prev.fields ?? {}), [field.id]: (prev.fields?.[field.id] ?? 0) + 1 },
     }));
+    triggerFlash(field.id);
   };
 
   const clickPower = getClickPower(state);
@@ -711,7 +719,7 @@ export default function CornClicker() {
                 const nextCost = getCost(def, owned, costMult);
                 const fillPct = canAfford ? 100 : Math.min(100, Math.floor((state.corn / nextCost) * 100));
                 return (
-                  <div key={def.id} className={styles.upgradeRow}>
+                  <div key={def.id} className={`${styles.upgradeRow} ${flashIds.has(def.id) ? styles.rowFlash : ''}`}>
                     <div className={styles.upgradeInfo}>
                       <span className={styles.upgradeName}>{def.name}</span>
                       <span className={styles.upgradeDesc}>{def.desc}</span>
@@ -837,7 +845,7 @@ export default function CornClicker() {
               const cost = maxed ? 0 : (field.costs[level] ?? 0);
               const canAfford = !maxed && spendableSeeds >= cost;
               return (
-                <div key={field.id} className={styles.fieldRow}>
+                <div key={field.id} className={`${styles.fieldRow} ${flashIds.has(field.id) ? styles.rowFlashGold : ''}`}>
                   <div className={styles.fieldInfo}>
                     <span className={styles.fieldName}>{field.emoji} {field.name}</span>
                     <span className={styles.fieldDesc}>{field.desc(level)}</span>

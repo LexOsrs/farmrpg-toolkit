@@ -537,6 +537,25 @@
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-md);
   background: var(--color-input-bg);
+  transition: background 0.15s;
+}
+
+.rowFlash {
+  animation: flashGreen 0.4s ease-out;
+}
+
+@keyframes flashGreen {
+  0% { background: var(--color-green-bg); box-shadow: 0 0 8px rgba(46, 125, 50, 0.3); }
+  100% { background: var(--color-input-bg); box-shadow: none; }
+}
+
+.rowFlashGold {
+  animation: flashGold 0.4s ease-out;
+}
+
+@keyframes flashGold {
+  0% { background: rgba(245, 200, 66, 0.2); box-shadow: 0 0 8px rgba(245, 200, 66, 0.3); }
+  100% { background: var(--color-input-bg); box-shadow: none; }
 }
 
 .upgradeInfo {
