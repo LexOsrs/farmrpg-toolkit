@@ -962,7 +962,12 @@ export default function CornClicker() {
                   <div key={pet.id} className={styles.petRow}>
                     <span className={styles.petEmoji}>❓</span>
                     <div className={styles.petInfo}>
-                      <span className={styles.petName} style={{ color: '#aaa' }}>???</span>
+                      <span className={styles.petName} style={{ color: '#aaa' }}>
+                        ???
+                        <span className={styles.petRarity} style={{ color: rarityColors[pet.rarity] }}>
+                          {' '}{pet.rarity}
+                        </span>
+                      </span>
                       <span className={styles.petDesc}>???</span>
                     </div>
                   </div>
