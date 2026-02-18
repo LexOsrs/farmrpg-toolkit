@@ -189,6 +189,39 @@
   to { opacity: 0; }
 }
 
+/* --- Prestige flash --- */
+
+.prestigeFlash {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 6rem;
+  background: radial-gradient(circle, rgba(245, 200, 66, 0.4) 0%, transparent 70%);
+  animation: prestigeBurst 1.2s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes prestigeBurst {
+  0% {
+    opacity: 1;
+    background: radial-gradient(circle, rgba(245, 200, 66, 0.6) 0%, rgba(245, 200, 66, 0.2) 40%, transparent 70%);
+    transform: scale(0.8);
+  }
+  30% {
+    opacity: 1;
+    background: radial-gradient(circle, rgba(245, 200, 66, 0.3) 0%, transparent 60%);
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    background: radial-gradient(circle, transparent 0%, transparent 100%);
+    transform: scale(1.5);
+  }
+}
+
 .achievementList {
   display: flex;
   flex-direction: column;
@@ -266,7 +299,7 @@
   white-space: nowrap;
 }
 
-.prestigePanel {
+.seedsPanel {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
@@ -667,50 +700,137 @@
   transition: transform 0.1s;
 }
 
-.crateHero {
+/* --- Crate Section (unified grid) --- */
+
+.crateSection {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-xs);
+}
+
+.crateCard {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  width: 100%;
-  padding: var(--space-lg) var(--space-md);
-  border: 2px dashed var(--color-border);
-  border-radius: var(--radius-lg);
+  padding: var(--space-sm) var(--space-xs) var(--space-xs);
+  border-radius: var(--radius-md);
+  overflow: hidden;
   background: var(--color-input-bg);
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
-  -webkit-tap-highlight-color: transparent;
 }
 
-.crateHero:hover {
-  border-color: var(--color-green);
-  background: var(--color-green-bg);
+/* Rotating border glow — only on .crateCardOwned */
+.crateCardOwned::before {
+  content: '';
+  position: absolute;
+  inset: -80%;
+  background: conic-gradient(from 0deg, transparent 0%, var(--sparkle-color) 8%, transparent 16%);
+  animation: rotateBorder 4s linear infinite;
+  z-index: 0;
+  opacity: 0.55;
 }
 
-.crateHero:active {
-  transform: scale(0.97);
+.crateCardOwned::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: calc(var(--radius-md) - 2px);
+  background: var(--color-input-bg);
+  z-index: 0;
 }
 
-.crateHeroEmoji {
-  font-size: 3.5rem;
+.crateCardOwned > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes rotateBorder {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.crateSparkle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crateCardEmoji {
+  font-size: 1.8rem;
   line-height: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.crateCardBounce {
   animation: gentleBounce 2s ease-in-out infinite;
 }
 
 @keyframes gentleBounce {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  50% { transform: translateY(-4px); }
 }
 
-.crateHeroCount {
-  font-size: 1.1rem;
+.crateCardRarity {
+  font-size: 0.6rem;
   font-weight: 700;
-  color: var(--color-text);
+  text-transform: capitalize;
 }
 
-.crateHeroAction {
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
+.crateOpenBtn {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px var(--space-sm);
+  border: 1.5px solid;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+}
+
+.crateOpenBtn:hover {
+  opacity: 0.8;
+}
+
+.crateOpenBtn:active {
+  transform: scale(0.95);
+}
+
+.crateCountEmpty {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-dim);
+  padding: 3px 0;
+}
+
+.crateBuyBtn {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px var(--space-sm);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #f5c842, #e6a817);
+  color: #5a3e00;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+  width: 100%;
+  margin-top: auto;
+}
+
+.crateBuyBtn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.crateBuyBtn:disabled {
+  background: var(--color-border);
+  color: var(--color-text-dim);
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .modalOverlay {

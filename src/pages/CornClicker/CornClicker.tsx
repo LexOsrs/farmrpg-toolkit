@@ -6,6 +6,9 @@ import styles from './CornClicker.module.css';
 
 type BuyAmount = 1 | 10 | 'max';
 
+type Rarity = 'common' | 'uncommon' | 'rare' | 'legendary';
+const rarities: Rarity[] = ['common', 'uncommon', 'rare', 'legendary'];
+
 interface GameState {
   corn: number;
   totalCorn: number;
@@ -17,13 +20,15 @@ interface GameState {
   totalPrestiges: number;
   fields: Record<string, number>;
   pets: Record<string, number>;
-  crates: number;
+  crates: Record<string, number>;
   completed: boolean;
   lastTick: number;
 }
 
 const MAX_OFFLINE_SECONDS = 60 * 60; // 1 hour
 const CORNUCOPIA_COST = 10_000;
+
+const crateCosts: Record<Rarity, number> = { common: 25, uncommon: 75, rare: 200, legendary: 1_000 };
 
 const defaultState: GameState = {
   corn: 0,
@@ -36,7 +41,7 @@ const defaultState: GameState = {
   totalPrestiges: 0,
   fields: {},
   pets: {},
-  crates: 0,
+  crates: {},
   completed: false,
   lastTick: 0,
 };
@@ -118,8 +123,6 @@ const fieldDefs: FieldDef[] = [
 
 // --- Pets ---
 
-type Rarity = 'common' | 'uncommon' | 'rare' | 'legendary';
-
 interface PetDef {
   id: string;
   name: string;
@@ -148,16 +151,23 @@ const petDefs: PetDef[] = [
 const rarityWeights: Record<Rarity, number> = { common: 50, uncommon: 30, rare: 15, legendary: 5 };
 const rarityColors: Record<Rarity, string> = { common: '#6b7280', uncommon: '#2e7d4f', rare: '#4a7abb', legendary: '#d4a017' };
 
-function rollPet(): PetDef {
+function rollRarity(): Rarity {
   const totalWeight = Object.values(rarityWeights).reduce((a, b) => a + b, 0);
   let roll = Math.random() * totalWeight;
-  let selectedRarity: Rarity = 'common';
   for (const [rarity, weight] of Object.entries(rarityWeights) as [Rarity, number][]) {
     roll -= weight;
-    if (roll <= 0) { selectedRarity = rarity; break; }
+    if (roll <= 0) return rarity;
   }
-  const pool = petDefs.filter(p => p.rarity === selectedRarity);
+  return 'common';
+}
+
+function rollPet(rarity: Rarity): PetDef {
+  const pool = petDefs.filter(p => p.rarity === rarity);
   return pool[Math.floor(Math.random() * pool.length)]!;
+}
+
+function getTotalCrates(crates: Record<string, number>): number {
+  return Object.values(crates).reduce((a, b) => a + b, 0);
 }
 
 function getPetBonuses(pets: Record<string, number>) {
@@ -256,17 +266,23 @@ const buyAmounts: BuyAmount[] = [1, 10, 'max'];
 
 let particleId = 0;
 
-type Tab = 'upgrades' | 'achievements' | 'prestige' | 'fields' | 'pets';
+type Tab = 'upgrades' | 'achievements' | 'seeds' | 'pets';
 
 export default function CornClicker() {
   const [rawState, setState] = useLocalStorage<GameState>('corn-clicker', defaultState);
   const raw = rawState ?? {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rawCrates = (raw as any).crates;
+  const migratedCrates: Record<string, number> =
+    typeof rawCrates === 'number' ? (rawCrates > 0 ? { common: rawCrates } : {})
+    : (() => { const c = { ...(rawCrates ?? {}) }; if (c.random) { c.common = (c.common ?? 0) + c.random; delete c.random; } return c; })();
   const state: GameState = {
     ...defaultState,
     ...raw,
     achievements: raw.achievements ?? defaultState.achievements,
     fields: raw.fields ?? defaultState.fields,
     pets: raw.pets ?? defaultState.pets,
+    crates: migratedCrates,
     lifetimeSeeds: raw.lifetimeSeeds ?? (raw.goldenSeeds ?? 0),
   };
   const [buyAmount, setBuyAmount] = useState<BuyAmount>(1);
@@ -279,6 +295,7 @@ export default function CornClicker() {
   const [petParticles, setPetParticles] = useState<Particle[]>([]);
   const [crate, setCrate] = useState<{ pet: PetDef; level: number; isNew: boolean; phase: 'wiggle' | 'reveal' } | null>(null);
   const [debugOpenState, setDebugOpenState] = useState(false);
+  const [prestigeFlash, setPrestigeFlash] = useState(false);
   const stateRef = useRef(state);
   stateRef.current = state;
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -459,6 +476,7 @@ export default function CornClicker() {
       title: `🌟 Prestige for ${seedsToEarn} Golden Seed${seedsToEarn === 1 ? '' : 's'}?`,
       body: `Your corn and upgrades will be reset, but you'll earn ${seedsToEarn} Golden Seed${seedsToEarn === 1 ? '' : 's'} and a pet crate! Achievements, fields, and pets are kept.`,
       onConfirm: () => {
+        const crateRarity = rollRarity();
         setState(prev => ({
           ...defaultState,
           achievements: prev.achievements ?? [],
@@ -467,26 +485,40 @@ export default function CornClicker() {
           totalPrestiges: (prev.totalPrestiges ?? 0) + 1,
           fields: prev.fields ?? {},
           pets: prev.pets ?? {},
-          crates: (prev.crates ?? 0) + 1,
+          crates: { ...(prev.crates ?? {}), [crateRarity]: ((prev.crates ?? {})[crateRarity] ?? 0) + 1 },
           lastTick: Date.now(),
         }));
         firstRender.current = true;
-        showToast(`🌟 +${seedsToEarn} Golden Seeds! 📦 +1 Pet Crate!`);
+        showToast(`🌟 +${seedsToEarn} Golden Seeds! 📦 +1 ${crateRarity} crate!`);
+        setPrestigeFlash(true);
+        setTimeout(() => setPrestigeFlash(false), 1200);
         setModal(null);
       },
     });
   };
 
-  const handleOpenCrate = () => {
-    if ((state.crates ?? 0) <= 0) return;
-    const newPet = rollPet();
+  const handleOpenCrate = (rarity: Rarity) => {
+    const count = state.crates[rarity] ?? 0;
+    if (count <= 0) return;
+    const newPet = rollPet(rarity);
     const currentPetLevel = state.pets?.[newPet.id] ?? 0;
     setState(prev => ({
       ...prev,
-      crates: (prev.crates ?? 0) - 1,
+      crates: { ...(prev.crates ?? {}), [rarity]: ((prev.crates ?? {})[rarity] ?? 0) - 1 },
     }));
     setCrate({ pet: newPet, level: currentPetLevel + 1, isNew: currentPetLevel === 0, phase: 'wiggle' });
     setTimeout(() => setCrate(prev => prev ? { ...prev, phase: 'reveal' } : null), 1000);
+  };
+
+  const handleBuyCrate = (rarity: Rarity) => {
+    const cost = crateCosts[rarity];
+    if (state.goldenSeeds < cost) return;
+    setState(prev => ({
+      ...prev,
+      goldenSeeds: (prev.goldenSeeds ?? 0) - cost,
+      crates: { ...(prev.crates ?? {}), [rarity]: ((prev.crates ?? {})[rarity] ?? 0) + 1 },
+    }));
+    triggerFlash(`crate-${rarity}`);
   };
 
   const dismissCrate = () => {
@@ -519,7 +551,8 @@ export default function CornClicker() {
   const spendableSeeds = state.goldenSeeds ?? 0;
   const petBonuses = getPetBonuses(state.pets ?? {});
   const seedsOnPrestige = Math.floor(calcGoldenSeeds(state.totalCorn, acreLevel) * petBonuses.seedMult);
-  const hasCrates = (state.crates ?? 0) > 0;
+  const totalCrateCount = getTotalCrates(state.crates);
+  const hasCrates = totalCrateCount > 0;
   const hasAnyPet = Object.values(state.pets).some(l => l > 0) || hasCrates;
   const allFieldsMaxed = fieldDefs.every(f => (state.fields[f.id] ?? 0) >= FIELD_MAX);
   const allPetsCollected = petDefs.every(p => (state.pets[p.id] ?? 0) > 0);
@@ -574,10 +607,12 @@ export default function CornClicker() {
                   <label>Prestiges</label>
                   <input type="number" value={state.totalPrestiges} onChange={e => setState(prev => ({ ...prev, totalPrestiges: Number(e.target.value) }))} className={styles.debugInput} />
                 </div>
-                <div className={styles.debugRow}>
-                  <label>Crates</label>
-                  <input type="number" value={state.crates} onChange={e => setState(prev => ({ ...prev, crates: Number(e.target.value) }))} className={styles.debugInput} />
-                </div>
+                {rarities.map(r => (
+                  <div key={r} className={styles.debugRow}>
+                    <label>📦 {r}</label>
+                    <input type="number" min={0} value={state.crates[r] ?? 0} onChange={e => setState(prev => ({ ...prev, crates: { ...prev.crates, [r]: Math.max(0, Number(e.target.value)) } }))} className={styles.debugInput} />
+                  </div>
+                ))}
                 <div className={styles.debugRow}>
                   <label>Clicks</label>
                   <input type="number" value={state.totalClicks} onChange={e => setState(prev => ({ ...prev, totalClicks: Number(e.target.value) }))} className={styles.debugInput} />
@@ -660,18 +695,11 @@ export default function CornClicker() {
             <span className={styles.tabLabel}>Upgrades</span>
           </button>
           <button
-            className={`${styles.tabBtn} ${tab === 'prestige' ? styles.tabActive : ''}`}
-            onClick={() => setTab('prestige')}
+            className={`${styles.tabBtn} ${tab === 'seeds' ? styles.tabActive : ''}`}
+            onClick={() => setTab('seeds')}
           >
             <span className={styles.tabEmoji}>🌟</span>
-            <span className={styles.tabLabel}>{spendableSeeds > 0 ? spendableSeeds : 'Prestige'}</span>
-          </button>
-          <button
-            className={`${styles.tabBtn} ${tab === 'fields' ? styles.tabActive : ''}`}
-            onClick={() => setTab('fields')}
-          >
-            <span className={styles.tabEmoji}>🌾</span>
-            <span className={styles.tabLabel}>Fields</span>
+            <span className={styles.tabLabel}>{spendableSeeds > 0 ? spendableSeeds : 'Seeds'}</span>
           </button>
           {hasAnyPet && (
             <button
@@ -679,7 +707,7 @@ export default function CornClicker() {
               onClick={() => setTab('pets')}
             >
               <span className={styles.tabEmoji}>🐾</span>
-              <span className={styles.tabLabel}>{hasCrates ? `📦${state.crates}` : 'Pets'}</span>
+              <span className={styles.tabLabel}>{hasCrates ? `📦${totalCrateCount}` : 'Pets'}</span>
             </button>
           )}
           <button
@@ -783,24 +811,13 @@ export default function CornClicker() {
           </div>
         )}
 
-        {tab === 'prestige' && (
-          <div className={styles.prestigePanel}>
-            <div className={styles.prestigeNote}>
-              Prestiging resets your corn and upgrades, but earns you Golden Seeds. Spend seeds in the Fields tab on permanent bonuses. You'll also receive a pet crate each time!
-            </div>
-            <div className={styles.prestigeDivider} />
+        {tab === 'seeds' && (
+          <div className={styles.seedsPanel}>
             <div className={styles.prestigeInfo}>
               <div className={styles.prestigeStat}>
                 <span className={styles.prestigeLabel}>Golden Seeds</span>
                 <span className={styles.prestigeValue}>🌟 {spendableSeeds}</span>
               </div>
-              <div className={styles.prestigeStat}>
-                <span className={styles.prestigeLabel}>Total corn this run</span>
-                <span className={styles.prestigeValue}>{formatSilver(Math.floor(state.totalCorn))}</span>
-              </div>
-            </div>
-            <div className={styles.prestigeDivider} />
-            <div className={styles.prestigeInfo}>
               <div className={styles.prestigeStat}>
                 <span className={styles.prestigeLabel}>Seeds on prestige</span>
                 <span className={styles.prestigeValue}>
@@ -831,73 +848,70 @@ export default function CornClicker() {
               }
             </button>
             <div className={styles.prestigeNote}>
-              Resets corn and upgrades. Keeps achievements, seeds, fields, and pets.
+              Resets corn and upgrades. Keeps achievements, seeds, fields, and pets. Earns a pet crate!
             </div>
-          </div>
-        )}
-
-        {tab === 'fields' && (
-          <div className={styles.fieldList}>
-            <div className={styles.fieldSeedCount}>🌟 {spendableSeeds} Golden Seeds available</div>
-            {fieldDefs.map(field => {
-              const level = state.fields[field.id] ?? 0;
-              const maxed = level >= FIELD_MAX;
-              const cost = maxed ? 0 : (field.costs[level] ?? 0);
-              const canAfford = !maxed && spendableSeeds >= cost;
-              return (
-                <div key={field.id} className={`${styles.fieldRow} ${flashIds.has(field.id) ? styles.rowFlashGold : ''}`}>
-                  <div className={styles.fieldInfo}>
-                    <span className={styles.fieldName}>{field.emoji} {field.name}</span>
-                    <span className={styles.fieldDesc}>{field.desc(level)}</span>
-                    <div className={styles.fieldPips}>
-                      {Array.from({ length: FIELD_MAX }, (_, i) => i + 1).map(i => (
-                        <span
-                          key={i}
-                          className={`${styles.fieldPip} ${i <= level ? styles.fieldPipFilled : ''}`}
-                        />
-                      ))}
+            <div className={styles.prestigeDivider} />
+            <div className={styles.fieldList}>
+              {fieldDefs.map(field => {
+                const level = state.fields[field.id] ?? 0;
+                const maxed = level >= FIELD_MAX;
+                const cost = maxed ? 0 : (field.costs[level] ?? 0);
+                const canAfford = !maxed && spendableSeeds >= cost;
+                return (
+                  <div key={field.id} className={`${styles.fieldRow} ${flashIds.has(field.id) ? styles.rowFlashGold : ''}`}>
+                    <div className={styles.fieldInfo}>
+                      <span className={styles.fieldName}>{field.emoji} {field.name}</span>
+                      <span className={styles.fieldDesc}>{field.desc(level)}</span>
+                      <div className={styles.fieldPips}>
+                        {Array.from({ length: FIELD_MAX }, (_, i) => i + 1).map(i => (
+                          <span
+                            key={i}
+                            className={`${styles.fieldPip} ${i <= level ? styles.fieldPipFilled : ''}`}
+                          />
+                        ))}
+                      </div>
                     </div>
+                    <button
+                      className={styles.fieldBuyBtn}
+                      disabled={!canAfford}
+                      onClick={() => handleFieldUpgrade(field)}
+                    >
+                      {maxed ? 'MAX' : `🌟 ${cost}`}
+                    </button>
                   </div>
-                  <button
-                    className={styles.fieldBuyBtn}
-                    disabled={!canAfford}
-                    onClick={() => handleFieldUpgrade(field)}
-                  >
-                    {maxed ? 'MAX' : `🌟 ${cost}`}
+                );
+              })}
+              <div className={styles.cornucopiaSection}>
+                <div className={styles.cornucopiaDivider} />
+                {isCompleted ? (
+                  <button className={styles.cornucopiaBtn} onClick={() => setShowCompletion(true)}>
+                    <span className={styles.cornucopiaEmoji}>🌽</span>
+                    <span className={styles.cornucopiaTitle}>Golden Cornucopia</span>
+                    <span className={styles.cornucopiaDesc}>Complete! Tap to view.</span>
                   </button>
-                </div>
-              );
-            })}
-            <div className={styles.cornucopiaSection}>
-              <div className={styles.cornucopiaDivider} />
-              {isCompleted ? (
-                <button className={styles.cornucopiaBtn} onClick={() => setShowCompletion(true)}>
-                  <span className={styles.cornucopiaEmoji}>🌽</span>
-                  <span className={styles.cornucopiaTitle}>Golden Cornucopia</span>
-                  <span className={styles.cornucopiaDesc}>Complete! Tap to view.</span>
-                </button>
-              ) : !allFieldsMaxed ? (
-                <button className={styles.cornucopiaBtn} disabled>
-                  <span className={styles.cornucopiaEmoji}>❓</span>
-                  <span className={styles.cornucopiaTitle}>???</span>
-                  <span className={styles.cornucopiaDesc}>🌟 {formatSilver(CORNUCOPIA_COST)}</span>
-                </button>
-              ) : (
-                <button
-                  className={styles.cornucopiaBtn}
-                  disabled={spendableSeeds < CORNUCOPIA_COST || !allPetsCollected}
-                  onClick={handleComplete}
-                >
-                  <span className={styles.cornucopiaEmoji}>🌽</span>
-                  <span className={styles.cornucopiaTitle}>Golden Cornucopia</span>
-                  <span className={styles.cornucopiaDesc}>
-                    {!allPetsCollected
-                      ? `Collect all pets · 🌟 ${formatSilver(CORNUCOPIA_COST)}`
-                      : `The ultimate harvest · 🌟 ${formatSilver(CORNUCOPIA_COST)}`
-                    }
-                  </span>
-                </button>
-              )}
+                ) : !allFieldsMaxed ? (
+                  <button className={styles.cornucopiaBtn} disabled>
+                    <span className={styles.cornucopiaEmoji}>❓</span>
+                    <span className={styles.cornucopiaTitle}>???</span>
+                    <span className={styles.cornucopiaDesc}>🌟 {formatSilver(CORNUCOPIA_COST)}</span>
+                  </button>
+                ) : (
+                  <button
+                    className={styles.cornucopiaBtn}
+                    disabled={spendableSeeds < CORNUCOPIA_COST || !allPetsCollected}
+                    onClick={handleComplete}
+                  >
+                    <span className={styles.cornucopiaEmoji}>🌽</span>
+                    <span className={styles.cornucopiaTitle}>Golden Cornucopia</span>
+                    <span className={styles.cornucopiaDesc}>
+                      {!allPetsCollected
+                        ? `Collect all pets · 🌟 ${formatSilver(CORNUCOPIA_COST)}`
+                        : `The ultimate harvest · 🌟 ${formatSilver(CORNUCOPIA_COST)}`
+                      }
+                    </span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -905,15 +919,35 @@ export default function CornClicker() {
         {tab === 'pets' && (
           <div className={styles.petList}>
             <div className={styles.prestigeNote}>
-              Prestige to earn pet crates. Tap a crate to open it! Duplicates level up, making their bonus stronger. Rarer pets give bigger boosts.
+              Prestige to earn random crates, or buy specific ones with Golden Seeds. Duplicates level up pets, making their bonus stronger.
             </div>
-            {hasCrates && (
-              <button className={styles.crateHero} onClick={handleOpenCrate}>
-                <span className={styles.crateHeroEmoji}>📦</span>
-                <span className={styles.crateHeroCount}>{state.crates} crate{state.crates !== 1 ? 's' : ''}</span>
-                <span className={styles.crateHeroAction}>Tap to open!</span>
-              </button>
-            )}
+            <div className={styles.crateSection}>
+              {(Object.entries(crateCosts) as [Rarity, number][]).map(([rarity, cost]) => {
+                const count = state.crates[rarity] ?? 0;
+                return (
+                  <div key={rarity} className={`${styles.crateCard} ${count > 0 ? styles.crateCardOwned : ''} ${flashIds.has(`crate-${rarity}`) ? styles.rowFlashGold : ''}`} style={{ '--sparkle-color': rarityColors[rarity] } as React.CSSProperties}>
+                    <div className={styles.crateSparkle}>
+                      <span className={`${styles.crateCardEmoji} ${count > 0 ? styles.crateCardBounce : ''}`}>📦</span>
+                    </div>
+                    <span className={styles.crateCardRarity} style={{ color: rarityColors[rarity] }}>{rarity}</span>
+                    {count > 0 ? (
+                      <button className={styles.crateOpenBtn} style={{ borderColor: rarityColors[rarity], color: rarityColors[rarity] }} onClick={() => handleOpenCrate(rarity)}>
+                        Open ({count})
+                      </button>
+                    ) : (
+                      <div className={styles.crateCountEmpty}>0</div>
+                    )}
+                    <button
+                      className={styles.crateBuyBtn}
+                      disabled={spendableSeeds < cost}
+                      onClick={() => handleBuyCrate(rarity)}
+                    >
+                      🌟 {cost}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
             <div className={styles.petListInner}>
               <div className={styles.particleContainer}>
                 {petParticles.map(p => (
@@ -988,6 +1022,8 @@ export default function CornClicker() {
       </button>
 
       {toast && <div className={styles.toast}>{toast}</div>}
+
+      {prestigeFlash && <div className={styles.prestigeFlash}>🌟</div>}
 
       {modal && (
         <div className={styles.modalOverlay} onClick={() => setModal(null)}>
