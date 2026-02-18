@@ -22,7 +22,7 @@ interface GameState {
   lastTick: number;
 }
 
-const MAX_OFFLINE_SECONDS = 8 * 60 * 60; // 8 hours
+const MAX_OFFLINE_SECONDS = 60 * 60; // 1 hour
 const CORNUCOPIA_COST = 10_000;
 
 const defaultState: GameState = {
@@ -325,7 +325,9 @@ export default function CornClicker() {
       setState(prev => ({ ...prev, lastTick: Date.now() }));
       return;
     }
-    const elapsed = Math.min(Math.floor((Date.now() - last) / 1000), MAX_OFFLINE_SECONDS);
+    const rawElapsed = Math.floor((Date.now() - last) / 1000);
+    const elapsed = Math.min(rawElapsed, MAX_OFFLINE_SECONDS);
+    const capped = rawElapsed > MAX_OFFLINE_SECONDS;
     if (elapsed < 5) {
       setState(prev => ({ ...prev, lastTick: Date.now() }));
       return;
@@ -348,7 +350,8 @@ export default function CornClicker() {
       const timeStr = mins >= 60
         ? `${Math.floor(mins / 60)}h ${mins % 60}m`
         : mins > 0 ? `${mins}m` : `${elapsed}s`;
-      showToast(`🌙 Welcome back! Earned ${formatSilver(earned)} corn while away (${timeStr})`);
+      const capNote = capped ? ' (1h max)' : '';
+      showToast(`🌙 Welcome back! Earned ${formatSilver(earned)} corn while away (${timeStr}${capNote})`);
     } else {
       setState(prev => ({ ...prev, lastTick: Date.now() }));
     }
