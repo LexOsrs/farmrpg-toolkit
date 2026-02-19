@@ -8,6 +8,7 @@ const navLinks = [
   { name: 'Friendship', to: '/friendship' },
   { name: 'Production', to: '/production' },
   { name: 'Vault', to: '/vault' },
+  { name: 'Daily', to: '/daily' },
 ];
 
 export default function Nav() {

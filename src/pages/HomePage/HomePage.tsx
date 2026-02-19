@@ -8,6 +8,7 @@ const tools = [
   { name: 'Friendship Calculator', to: '/friendship', emoji: '💚', desc: 'Gifts and XP needed to reach friendship levels.' },
   { name: 'Production Planner', to: '/production', emoji: '🏭', desc: 'Plan building upgrades and see total silver costs.' },
   { name: 'Vault Solver', to: '/vault', emoji: '🔐', desc: 'Optimal guesses to crack the vault in 5 or fewer tries.' },
+  { name: 'Daily Checklist', to: '/daily', emoji: '✅', desc: 'Tick off your daily FarmRPG tasks.' },
 ];
 
 export default function HomePage() {
