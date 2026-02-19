@@ -1,9 +1,35 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+}
+
+.heroIcon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.heroTitle {
+  font-size: 1.4em;
+  font-weight: 700;
+  color: var(--color-green);
+  margin: 0;
+}
+
 .grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
   width: 100%;
-  margin-top: 4px;
 }
 
 .toolCard {

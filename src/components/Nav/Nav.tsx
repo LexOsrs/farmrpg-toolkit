@@ -2,12 +2,12 @@ import { Link, useLocation } from 'react-router-dom';
 import styles from './Nav.module.css';
 
 const navLinks = [
-  { name: 'Apple Pie Calculator', to: '/apple-pie' },
-  { name: 'Cooking Calculator', to: '/cooking' },
-  { name: 'Crop Yield Calculator', to: '/crop-yield' },
-  { name: 'Friendship Calculator', to: '/friendship' },
-  { name: 'Production Planner', to: '/production' },
-  { name: 'Vault Solver', to: '/vault' },
+  { name: 'Apple Pie', to: '/apple-pie' },
+  { name: 'Cooking', to: '/cooking' },
+  { name: 'Crop Yield', to: '/crop-yield' },
+  { name: 'Friendship', to: '/friendship' },
+  { name: 'Production', to: '/production' },
+  { name: 'Vault', to: '/vault' },
 ];
 
 export default function Nav() {
@@ -15,11 +15,10 @@ export default function Nav() {
 
   return (
     <nav className={styles.mainNav}>
-      <div className={styles.titleRow}>
-        <img src={import.meta.env.BASE_URL + 'farm_large.png'} alt="Farm" className={styles.farmIcon} />
-        <Link className={styles.titleLink} to="/">FarmRPG Toolkit</Link>
-      </div>
       <div className={styles.pillBar}>
+        <Link to="/" className={styles.homeLink} aria-label="Home">
+          <img src={import.meta.env.BASE_URL + 'farm_large.png'} alt="" className={styles.farmIcon} />
+        </Link>
         {navLinks.map(link => (
           <Link
             key={link.to}

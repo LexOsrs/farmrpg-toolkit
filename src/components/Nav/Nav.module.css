@@ -1,8 +1,6 @@
 .mainNav {
   width: 100vw;
-  margin: 0;
   background: #f8fafc;
-  border-radius: 0;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   border-bottom: 1px solid rgba(0,0,0,0.06);
   position: fixed;
@@ -12,36 +10,11 @@
   z-index: 100;
 }
 
-.titleRow {
-  display: flex;
-  align-items: center;
-  padding: 6px 12px 2px;
-  gap: 8px;
-}
-
-.titleLink {
-  font-size: 1.3em;
-  font-weight: 700;
-  color: var(--color-green);
-  letter-spacing: 0.01em;
-  text-decoration: none;
-  transition: opacity 0.2s;
-}
-
-.titleLink:hover {
-  opacity: 0.75;
-}
-
-.farmIcon {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-}
-
 .pillBar {
   display: flex;
+  align-items: center;
   gap: 6px;
-  padding: 4px 12px 8px;
+  padding: 6px 12px;
   overflow-x: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
@@ -49,6 +22,25 @@
 
 .pillBar::-webkit-scrollbar {
   display: none;
+}
+
+.homeLink {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  margin-right: 2px;
+}
+
+.farmIcon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  transition: opacity 0.15s;
+}
+
+.homeLink:hover .farmIcon {
+  opacity: 0.7;
 }
 
 .pill {

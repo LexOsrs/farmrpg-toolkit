@@ -12,16 +12,22 @@ const tools = [
 
 export default function HomePage() {
   return (
-    <div className={styles.grid}>
-      {tools.map(tool => (
-        <Link key={tool.to} className={styles.toolCard} to={tool.to}>
-          <span className={styles.toolEmoji}>{tool.emoji}</span>
-          <div className={styles.toolText}>
-            <span className={styles.toolName}>{tool.name}</span>
-            <span className={styles.toolDesc}>{tool.desc}</span>
-          </div>
-        </Link>
-      ))}
+    <div className={styles.page}>
+      <div className={styles.hero}>
+        <img src={import.meta.env.BASE_URL + 'farm_large.png'} alt="Farm" className={styles.heroIcon} />
+        <h1 className={styles.heroTitle}>FarmRPG Toolkit</h1>
+      </div>
+      <div className={styles.grid}>
+        {tools.map(tool => (
+          <Link key={tool.to} className={styles.toolCard} to={tool.to}>
+            <span className={styles.toolEmoji}>{tool.emoji}</span>
+            <div className={styles.toolText}>
+              <span className={styles.toolName}>{tool.name}</span>
+              <span className={styles.toolDesc}>{tool.desc}</span>
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
