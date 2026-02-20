@@ -2,8 +2,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  margin-bottom: 8px;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-sm);
 }
 
 .emoji {
@@ -22,19 +22,19 @@
 .perksTitle {
   font-size: 1.18em;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-sm);
 }
 
 .seedWarning {
-  background: #fffbe6;
-  color: #8a6d1b;
-  border: 1.5px solid #ffe58f;
-  border-radius: 8px;
-  padding: 10px 14px;
-  margin-bottom: 14px;
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+  border: 1.5px solid var(--color-warning-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md) var(--space-md);
+  margin-bottom: var(--space-md);
   font-size: 1.04em;
   font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
 }

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { calculateCooking, computeTimeline, type CookingInputs } from '../../calculators/cooking';
-import { meals, getMealByName } from '../../data/meals';
+import { meals } from '../../data/meals';
 import { formatNumber, formatTimeCompact } from '../../utils/format';
 import Card from '../../components/Card/Card';
 import InfoCard from '../../components/InfoCard/InfoCard';
@@ -42,8 +42,6 @@ export default function CookingCalc() {
 
   const results = useMemo(() => calculateCooking(form), [form]);
   const timeline = useMemo(() => computeTimeline(form), [form]);
-  const meal = getMealByName(form.mealName);
-
   return (
     <>
       <div className={styles.titleRow}>
@@ -71,7 +69,7 @@ export default function CookingCalc() {
         <h2>Inputs</h2>
         <div className={styles.sectionsColumn}>
           <CollapsibleSection title="Meals">
-            <InputGroup label="Meal" htmlFor="meal" style={{ marginBottom: 2 }}>
+            <InputGroup label="Meal" htmlFor="meal" style={{ marginBottom: 8 }}>
               <select id="meal" className={styles.mealDropdown} value={form.mealName}
                 onChange={e => update('mealName', e.target.value)}>
                 {sortedMeals.map(m => {
@@ -81,16 +79,16 @@ export default function CookingCalc() {
                 })}
               </select>
             </InputGroup>
-            <InputGroup label="Quantity" htmlFor="batchSize" style={{ marginBottom: 2, maxWidth: 120 }}>
-              <input type="number" id="batchSize" min={1} step={1} value={form.batchSize}
-                style={{ width: 100 }}
-                onChange={e => update('batchSize', parseInt(e.target.value) || 1)} />
-            </InputGroup>
-            <InputGroup label="Max Ovens" htmlFor="maxOvens" style={{ marginBottom: 2, maxWidth: 120 }}>
-              <input type="number" id="maxOvens" min={1} max={10} step={1} value={form.maxOvens}
-                style={{ width: 70 }}
-                onChange={e => update('maxOvens', Math.max(1, Math.min(10, parseInt(e.target.value) || 1)))} />
-            </InputGroup>
+            <div className={styles.mealSubRow}>
+              <InputGroup label="Quantity" htmlFor="batchSize" style={{ marginBottom: 2 }}>
+                <input type="number" id="batchSize" min={1} step={1} value={form.batchSize}
+                  onChange={e => update('batchSize', parseInt(e.target.value) || 1)} />
+              </InputGroup>
+              <InputGroup label="Max Ovens" htmlFor="maxOvens" style={{ marginBottom: 2 }}>
+                <input type="number" id="maxOvens" min={1} max={10} step={1} value={form.maxOvens}
+                  onChange={e => update('maxOvens', Math.max(1, Math.min(10, parseInt(e.target.value) || 1)))} />
+              </InputGroup>
+            </div>
           </CollapsibleSection>
 
           <CollapsibleSection title="Meal Actions">
@@ -170,18 +168,6 @@ export default function CookingCalc() {
         <ResultRow label="Action Count:" value={`${results.totalActions} action${results.totalActions === 1 ? '' : 's'}`} />
         <ResultRow label="Total Mastery:" value={formatNumber(results.totalMastery)} />
         <ResultRow label="Total Time:" value={formatTimeCompact(results.finishTime)} />
-
-        {meal && (
-          <div style={{ marginTop: 8 }}>
-            <h4>Ingredients (x{form.batchSize})</h4>
-            {Object.entries(results.ingredients).map(([name, qty]) => (
-              <div key={name} className={styles.ingredientRow}>
-                <span>{name}</span>
-                <span>{formatNumber(qty)}</span>
-              </div>
-            ))}
-          </div>
-        )}
 
         <CookingTimeline steps={timeline} />
       </Card>

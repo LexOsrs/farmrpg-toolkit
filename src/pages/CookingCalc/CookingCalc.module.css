@@ -2,8 +2,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  margin-bottom: 8px;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-sm);
 }
 
 .emoji {
@@ -13,24 +13,26 @@
 .sectionsColumn {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-md);
   align-items: stretch;
 }
 
 .mealDropdown {
-  width: 180px !important;
+  width: 100% !important;
   min-width: 0;
-  max-width: 100%;
 }
 
-.ingredientRow {
+.mealSubRow {
   display: flex;
-  justify-content: space-between;
-  padding: 2px 0;
+  gap: var(--space-sm);
+}
+
+.mealSubRow > * {
+  flex: 1;
 }
 
 .timelineBlock {
-  margin-top: 12px;
+  margin-top: var(--space-md);
 }
 
 .timelineTable {
@@ -42,9 +44,9 @@
 .timelineTable th {
   font-weight: bold;
   text-align: left;
-  padding: 4px 8px;
+  padding: var(--space-xs) var(--space-sm);
 }
 
 .timelineTable td {
-  padding: 4px 8px;
+  padding: var(--space-xs) var(--space-sm);
 }

@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-md);
 }
 
 .label {
@@ -17,15 +17,15 @@
 }
 
 .loss {
-  color: #b94a4a;
-  background: #fbeaea;
-  border-radius: 6px;
-  padding: 2px 8px;
+  color: var(--color-loss);
+  background: var(--color-loss-bg);
+  border-radius: var(--radius-sm);
+  padding: 2px var(--space-sm);
 }
 
 .gain {
-  color: #2e7d4f;
-  background: #eafbee;
-  border-radius: 6px;
-  padding: 2px 8px;
+  color: var(--color-gain);
+  background: var(--color-gain-bg);
+  border-radius: var(--radius-sm);
+  padding: 2px var(--space-sm);
 }

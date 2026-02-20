@@ -2,8 +2,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  margin-bottom: 8px;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-sm);
 }
 
 .emoji {
@@ -13,7 +13,7 @@
 .sectionsColumn {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-md);
   align-items: stretch;
 }
 
@@ -21,9 +21,9 @@
   display: grid;
   grid-template-columns: 120px 1fr auto;
   align-items: center;
-  gap: 8px 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
+  gap: var(--space-sm) var(--space-md);
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .productRow:last-child {
@@ -46,7 +46,7 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .productIcon {
@@ -69,12 +69,12 @@
 .levelInputs {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-xs);
 }
 
 .levelInput {
   width: 72px;
-  padding: 7px 8px;
+  padding: 7px var(--space-sm);
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   font-size: 1rem;
@@ -123,12 +123,12 @@
 @media (max-width: 500px) {
   .productRow {
     grid-template-columns: 1fr auto;
-    gap: 4px 8px;
-    padding: 8px 0;
+    gap: var(--space-xs) var(--space-sm);
+    padding: var(--space-sm) 0;
   }
 
   .productInfo {
-    gap: 6px;
+    gap: var(--space-xs);
   }
 
   .productCost {
@@ -144,7 +144,7 @@
 
   .levelInput {
     width: 66px;
-    padding: 5px 6px;
+    padding: 5px var(--space-xs);
     font-size: 1rem;
   }
 

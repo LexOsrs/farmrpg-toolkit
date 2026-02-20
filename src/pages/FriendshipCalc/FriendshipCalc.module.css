@@ -2,8 +2,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  margin-bottom: 8px;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-sm);
 }
 
 .emoji {
@@ -22,16 +22,16 @@
 .bonusTitle {
   font-size: 1.18em;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-sm);
 }
 
 .levelRow {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .xpEstimate {
   font-size: 0.98em;
-  color: #4a5568;
+  color: var(--color-text-muted);
 }

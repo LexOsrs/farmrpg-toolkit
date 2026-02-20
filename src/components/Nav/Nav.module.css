@@ -1,7 +1,7 @@
 .mainNav {
   width: 100vw;
-  background: #f8fafc;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  background: var(--color-input-bg);
+  box-shadow: var(--shadow-sm);
   border-bottom: 1px solid rgba(0,0,0,0.06);
   position: fixed;
   top: 0;
@@ -13,8 +13,8 @@
 .pillBar {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
   overflow-x: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
@@ -45,7 +45,7 @@
 
 .pill {
   flex-shrink: 0;
-  padding: 5px 12px;
+  padding: var(--space-xs) var(--space-md);
   border-radius: 99px;
   font-size: 0.82em;
   font-weight: 500;
