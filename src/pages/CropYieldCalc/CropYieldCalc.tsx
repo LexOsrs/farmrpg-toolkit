@@ -52,12 +52,14 @@ export default function CropYieldCalc() {
         <h2>Inputs</h2>
         <RowGroup>
           <InputGroup label="Crop Spaces" htmlFor="cropSpaces" className={styles.halfWidth}>
-            <input type="number" id="cropSpaces" min={1} step={1} value={form.cropSpaces}
-              onChange={e => update('cropSpaces', parseInt(e.target.value) || 0)} />
+            <input type="number" id="cropSpaces" min={1} step={1} value={form.cropSpaces || ''}
+              onChange={e => update('cropSpaces', parseInt(e.target.value) || 0)}
+              onBlur={() => { if (form.cropSpaces < 1) update('cropSpaces', 1); }} />
           </InputGroup>
           <InputGroup label="Harvests" htmlFor="harvests" className={styles.halfWidth}>
-            <input type="number" id="harvests" min={1} step={1} value={form.harvests}
-              onChange={e => update('harvests', parseInt(e.target.value) || 0)} />
+            <input type="number" id="harvests" min={1} step={1} value={form.harvests || ''}
+              onChange={e => update('harvests', parseInt(e.target.value) || 0)}
+              onBlur={() => { if (form.harvests < 1) update('harvests', 1); }} />
           </InputGroup>
         </RowGroup>
         <RowGroup>

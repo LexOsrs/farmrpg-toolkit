@@ -66,9 +66,10 @@ export default function FriendshipCalc() {
         <h2>Inputs</h2>
         <RowGroup>
           <InputGroup label="Quantity" htmlFor="giftCount" style={{ maxWidth: 110 }}>
-            <input type="number" id="giftCount" min={1} step={1} value={form.giftCount}
+            <input type="number" id="giftCount" min={1} step={1} value={form.giftCount || ''}
               style={{ width: 100 }}
-              onChange={e => update('giftCount', parseInt(e.target.value) || 0)} />
+              onChange={e => update('giftCount', parseInt(e.target.value) || 0)}
+              onBlur={() => { if (form.giftCount < 1) update('giftCount', 1); }} />
           </InputGroup>
           <InputGroup label="Gift Type" htmlFor="giftType" className={styles.halfWidth}>
             <select id="giftType" className={styles.dropdown} value={form.giftType}
@@ -82,9 +83,10 @@ export default function FriendshipCalc() {
         <RowGroup>
           <InputGroup label="Current Level" htmlFor="currentLevel" className={styles.halfWidth}>
             <div className={styles.levelRow}>
-              <input type="number" id="currentLevel" min={1} max={99} step={0.1} value={form.currentLevel}
+              <input type="number" id="currentLevel" min={1} max={99} step={0.1} value={form.currentLevel || ''}
                 style={{ width: 90 }}
-                onChange={e => update('currentLevel', parseFloat(e.target.value) || 1)} />
+                onChange={e => update('currentLevel', parseFloat(e.target.value) || 0)}
+                onBlur={() => { if (form.currentLevel < 1) update('currentLevel', 1); }} />
               <span className={styles.xpEstimate}>XP (estimated): {formatNumber(Math.round(results.currentXP))}</span>
             </div>
           </InputGroup>

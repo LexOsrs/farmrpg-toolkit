@@ -81,12 +81,14 @@ export default function CookingCalc() {
             </InputGroup>
             <div className={styles.mealSubRow}>
               <InputGroup label="Quantity" htmlFor="batchSize" style={{ marginBottom: 2 }}>
-                <input type="number" id="batchSize" min={1} step={1} value={form.batchSize}
-                  onChange={e => update('batchSize', parseInt(e.target.value) || 1)} />
+                <input type="number" id="batchSize" min={1} step={1} value={form.batchSize || ''}
+                  onChange={e => update('batchSize', parseInt(e.target.value) || 0)}
+                  onBlur={() => { if (form.batchSize < 1) update('batchSize', 1); }} />
               </InputGroup>
               <InputGroup label="Max Ovens" htmlFor="maxOvens" style={{ marginBottom: 2 }}>
-                <input type="number" id="maxOvens" min={1} max={10} step={1} value={form.maxOvens}
-                  onChange={e => update('maxOvens', Math.max(1, Math.min(10, parseInt(e.target.value) || 1)))} />
+                <input type="number" id="maxOvens" min={1} max={10} step={1} value={form.maxOvens || ''}
+                  onChange={e => update('maxOvens', parseInt(e.target.value) || 0)}
+                  onBlur={() => { if (form.maxOvens < 1) update('maxOvens', 1); else if (form.maxOvens > 10) update('maxOvens', 10); }} />
               </InputGroup>
             </div>
           </CollapsibleSection>
@@ -119,7 +121,8 @@ export default function CookingCalc() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <input type="number" id="eventBonus" min={0} max={100} step={1} value={form.eventBonus}
                   style={{ width: 60 }}
-                  onChange={e => update('eventBonus', parseFloat(e.target.value) || 0)} />
+                  onChange={e => update('eventBonus', parseFloat(e.target.value) || 0)}
+                  onBlur={() => { if (form.eventBonus < 0) update('eventBonus', 0); }} />
                 <span style={{ fontSize: '1.1em', color: '#888' }}>%</span>
               </div>
             </InputGroup>

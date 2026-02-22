@@ -54,8 +54,9 @@ export default function ApplePieCalc() {
         <h2>Inputs</h2>
         <RowGroup>
           <InputGroup label="Number of Apple Pies" htmlFor="numPies" className={styles.halfWidth}>
-            <input type="number" id="numPies" min={1} step={1} value={form.numPies}
-              onChange={e => update('numPies', parseInt(e.target.value) || 0)} />
+            <input type="number" id="numPies" min={1} step={1} value={form.numPies || ''}
+              onChange={e => update('numPies', parseInt(e.target.value) || 0)}
+              onBlur={() => { if (form.numPies < 1) update('numPies', 1); }} />
           </InputGroup>
           <InputGroup label="Exploring Level" htmlFor="exploringLevel" className={styles.halfWidth}>
             <input type="number" id="exploringLevel" min={0} step={1} value={form.exploringLevel}
@@ -74,9 +75,10 @@ export default function ApplePieCalc() {
         </RowGroup>
         <InputGroup label="How long will it take you to reach your target Tower level?" htmlFor="waitAmount">
           <div className={styles.waitRow}>
-            <input type="number" id="waitAmount" min={1} step={1} value={form.waitAmount}
+            <input type="number" id="waitAmount" min={1} step={1} value={form.waitAmount || ''}
               style={{ width: 70 }}
-              onChange={e => update('waitAmount', parseInt(e.target.value) || 0)} />
+              onChange={e => update('waitAmount', parseInt(e.target.value) || 0)}
+              onBlur={() => { if (form.waitAmount < 1) update('waitAmount', 1); }} />
             <select id="waitUnit" value={form.waitUnit}
               className={styles.waitSelect}
               onChange={e => update('waitUnit', e.target.value as ApplePieInputs['waitUnit'])}>
