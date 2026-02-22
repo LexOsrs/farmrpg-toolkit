@@ -53,7 +53,7 @@ export default function ApplePieCalc() {
       <Card variant="inputs">
         <h2>Inputs</h2>
         <RowGroup>
-          <InputGroup label="Number of Apple Pies" htmlFor="numPies" className={styles.halfWidth}>
+          <InputGroup label="Apple Pies" htmlFor="numPies" className={styles.halfWidth}>
             <input type="number" id="numPies" min={1} step={1} value={form.numPies || ''}
               onChange={e => update('numPies', parseInt(e.target.value) || 0)}
               onBlur={() => { if (form.numPies < 1) update('numPies', 1); }} />
